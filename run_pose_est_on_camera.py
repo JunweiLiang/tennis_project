@@ -20,7 +20,8 @@ parser.add_argument("--cam_num", type=int, default=0,
         help="camera num")
 parser.add_argument("output_image", help="grab a image from camera and save to this file")
 
-
+# example run on a macbook
+# junweiliang@work_laptop:~/Desktop/projects/tennis_project$ python run_pose_est_on_camera.py --show_streaming ~/Downloads/output_pose.png --cam_num 1
 # if you see
 #   [ WARN:0@0.012] global cap_v4l.cpp:999 open VIDEOIO(V4L2:/dev/video0): can't open camera by index
 # 可能需要在笔记本电脑上登录一下你的账号，唤醒一下摄像头
