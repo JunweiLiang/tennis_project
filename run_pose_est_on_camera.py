@@ -9,6 +9,7 @@ import argparse
 
 # This is Google's open-source pose estimation package
 # $ pip install mediapipe
+# This will be running on CPU
 import mediapipe as mp
 
 parser = argparse.ArgumentParser()
