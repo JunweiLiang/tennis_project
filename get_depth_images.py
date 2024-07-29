@@ -6,6 +6,7 @@ import cv2
 
 import sys
 import argparse
+import numpy as np
 
 parser = argparse.ArgumentParser()
 
@@ -21,8 +22,10 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # Assume we are connected to a depth camera
+    # lazy import API for specified depth camera
     if args.camera_type == "realsense":
-        # lazy import API for specified depth camera
+
+        # https://www.intelrealsense.com/get-started-depth-camera/
         import pyrealsense2 as rs
 
         # Configure RealSense pipeline for depth and RGB.
@@ -68,6 +71,17 @@ if __name__ == "__main__":
             color_intrin = aligned_color_frame.profile.as_video_stream_profile().intrinsics  # 获取相机内参
 
             print(depth_intrin, color_intrin)
+
+            # Convert images to numpy arrays
+            depth_image = np.asanyarray(depth_frame.get_data())
+            color_image = np.asanyarray(color_frame.get_data())
+            # (480, 640, 3), (480, 640)
+            # depth_image are in meters
+            #print(color_image.shape, depth_image.shape)
+            print(depth_image[240, 320])
+
+            # Apply colormap on depth image (image must be converted to 8-bit per pixel first)
+            depth_colormap = cv2.applyColorMap(cv2.convertScaleAbs(depth_image, alpha=0.03), cv2.COLORMAP_JET)
 
 
     finally:
