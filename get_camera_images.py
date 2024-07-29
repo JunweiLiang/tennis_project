@@ -1,5 +1,5 @@
 # coding=utf-8
-# simple camera image grabbing exercise, from laptop cam, web cam, and depth camera
+# simple camera image grabbing exercise, from laptop cam, web cam
 
 # you can install cv2 with $ pip install opencv-python
 import cv2

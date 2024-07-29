@@ -1,6 +1,6 @@
 # coding=utf-8
 # simple camera image grabbing exercise, from laptop cam, web cam
-# and run human body/hand pose estimation and return visualization
+# and run object detection on the images and visualize
 
 # you can install cv2 with $ pip install opencv-python
 import cv2
@@ -8,10 +8,12 @@ import cv2
 import sys
 import argparse
 
-# This is Google's open-source pose estimation package
-# $ pip install mediapipe
-# This will be running on CPU
-import mediapipe as mp
+# This is a good open-source wrapper
+# pip install ultralytics
+# see tutorial here
+#   1. https://docs.ultralytics.com/models/yolov9/
+#   2. https://medium.com/@Mert.A/how-to-use-yolov9-for-object-detection-93598ad88d7d
+from ultralytics import YOLO
 
 parser = argparse.ArgumentParser()
 
@@ -23,65 +25,55 @@ parser.add_argument("--cam_num", type=int, default=0,
 parser.add_argument("output_image", help="grab a image from camera and save to this file")
 
 # example run on a macbook
-# junweiliang@work_laptop:~/Desktop/projects/tennis_project$ python run_pose_est_on_camera.py --show_streaming ~/Downloads/output_pose.png --cam_num 1
+# junweiliang@work_laptop:~/Desktop/projects/tennis_project$ python run_od_on_camera.py --show_streaming --cam_num 1 ~/Downloads/od_test.jpg
 # if you see
 #   [ WARN:0@0.012] global cap_v4l.cpp:999 open VIDEOIO(V4L2:/dev/video0): can't open camera by index
 # 可能需要在笔记本电脑上登录一下你的账号，唤醒一下摄像头
 
 
-# Initialize MediaPipe Hands.
-# will download model if needed
-# readme: https://github.com/google/mediapipe/blob/master/docs/solutions/hands.md
-mp_hands = mp.solutions.hands.Hands(
-    static_image_mode=False, # treat it as video stream
-    max_num_hands=2,
-    model_complexity=0, # 0/1 model,
-    min_detection_confidence=0.7,
-    min_tracking_confidence=0.7)
-
-# Initialize MediaPipe Skeleton.
-# https://github.com/google/mediapipe/blob/master/docs/solutions/pose.md
-
-mp_pose = mp.solutions.pose
-pose = mp_pose.Pose(
-    model_complexity=1, # 0/1/2, higher better model
-    static_image_mode=False,
-    smooth_landmarks=False,
-    min_detection_confidence=0.7,
-    min_tracking_confidence=0.7)
-# for drawing the landmarks
-mp_drawing = mp.solutions.drawing_utils
-mp_drawing_styles = mp.solutions.drawing_styles
+# initialize the object detection model
+# this will auto download the YOLOv9 checkpoint
+# see here for all the available models: https://docs.ultralytics.com/models/yolov9/#performance-on-ms-coco-dataset
+model = YOLO("yolov9c.pt")
 
 
-def run_mediapipe_on_image(frame_cv2):
+def run_od_on_image(
+        frame_cv2, od_model,
+        classes=[], conf=0.5,
+        bbox_thickness=4, text_thickness=2, font_size=2):
     """
-        frame_cv2 will be modified in place
+        run object detection inference and visualize in the image
     """
 
-    # Process the color image with MediaPipe
-    frame_for_mp = cv2.cvtColor(frame_cv2, cv2.COLOR_BGR2RGB)
-    # Process the image to detect the skeleton and hands
-    hand_results = mp_hands.process(frame_for_mp)
-    pose_results = pose.process(frame_for_mp)
+    # see here for inference arguments
+    # https://docs.ultralytics.com/modes/predict/#inference-arguments
+    results = od_model.predict(
+        frame_cv2,
+        classes=None if len(classes)==0 else classes,  # you can specify the classes you want
+        # see here for coco class indexes [0-79], 0 is person: https://gist.github.com/AruniRC/7b3dadd004da04c80198557db5da4bda
+        #classes=[0, 32], # detect person and sports ball only
+        conf=conf,
+        #half=True
+        )
 
-    if hand_results.multi_hand_landmarks:
+    # see here for the API documentation of results
+    # https://docs.ultralytics.com/modes/predict/#working-with-results
+    for result in results:
+        # each class?
+        for box in result.boxes:
+            bbox = [int(x) for x in box.xyxy[0]]
+            bbox_color = (0, 255, 0) # BGR
+            frame_cv2 = cv2.rectangle(
+                    frame_cv2,
+                    tuple(bbox[0:2]), tuple(bbox[2:4]),
+                    bbox_color, bbox_thickness)
 
-        for hand_landmarks in hand_results.multi_hand_landmarks:
-            mp_drawing.draw_landmarks(
-                frame_cv2,
-                hand_landmarks,
-                mp.solutions.hands.HAND_CONNECTIONS,
-                mp_drawing_styles.get_default_hand_landmarks_style())
-
-    # Draw the pose annotations on the RGB image.
-    if pose_results.pose_landmarks:
-        mp_drawing.draw_landmarks(
-            frame_cv2,
-            pose_results.pose_landmarks,
-            mp_pose.POSE_CONNECTIONS,
-            mp_drawing_styles.get_default_pose_landmarks_style())
-
+            frame_cv2 = cv2.putText(
+                    frame_cv2, "%s" % result.names[int(box.cls[0])],
+                    (bbox[0], bbox[1] - 10),  # specify the bottom left corner
+                    cv2.FONT_HERSHEY_PLAIN, font_size,
+                    bbox_color, text_thickness)
+    return frame_cv2, results
 
 
 
@@ -126,7 +118,7 @@ if __name__ == "__main__":
                     if not ret:
                         raise Exception("Error: Could not read frame from webcam.")
 
-                    run_mediapipe_on_image(frame)
+                    frame, _ = run_od_on_image(frame, model)
 
                     cv2.imshow("frame", frame)
 
@@ -136,7 +128,7 @@ if __name__ == "__main__":
             result, image = cam.read()
 
             if result:
-                run_mediapipe_on_image(image)
+                image, _ = run_od_on_image(image, model)
                 cv2.imwrite(args.output_image, image)
                 print("saved mediapiped image from web cam to %s" % args.output_image)
             else:
