@@ -25,7 +25,9 @@ if __name__ == "__main__":
     # lazy import API for specified depth camera
     if args.camera_type == "realsense":
 
+        # 1. install realsense-viewer through here:
         # https://www.intelrealsense.com/get-started-depth-camera/
+        # 2. pip install pyrealsense2
         import pyrealsense2 as rs
 
         # Configure RealSense pipeline for depth and RGB.
@@ -82,6 +84,16 @@ if __name__ == "__main__":
 
             # Apply colormap on depth image (image must be converted to 8-bit per pixel first)
             depth_colormap = cv2.applyColorMap(cv2.convertScaleAbs(depth_image, alpha=0.03), cv2.COLORMAP_JET)
+
+            # Stack both images horizontally
+            image = np.hstack((color_image, depth_colormap))
+
+            # Show the image
+            cv2.imshow('RGB and Depth Stream', image)
+
+            # Press 'q' to quit
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
 
 
     finally:
