@@ -10,7 +10,7 @@ import numpy as np
 
 parser = argparse.ArgumentParser()
 
-parser.add_argument("--camera_type", default="realsense", options=["realsense", "orbbec"])
+parser.add_argument("--camera_type", default="realsense")
 
 # 1. example use to get an image from the laptop camera
 # (base) junweil@precognition-laptop2:~$ python ~/projects/tennis_project/get_camera_image.py Downloads/output.png
