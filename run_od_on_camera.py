@@ -34,7 +34,7 @@ parser.add_argument("output_image", help="grab a image from camera and save to t
 # initialize the object detection model
 # this will auto download the YOLOv9 checkpoint
 # see here for all the available models: https://docs.ultralytics.com/models/yolov9/#performance-on-ms-coco-dataset
-model = YOLO("yolov9c.pt")
+model = YOLO("yolov9t.pt")
 
 
 def run_od_on_image(
