@@ -102,7 +102,7 @@ if __name__ == "__main__":
             #print(depth_image[240, 320]) # 单位：毫米
 
             # showing two points' depth
-            point1 = (240, 200)
+            point1 = (200, 200)
             point2 = (240, 320)
 
             color_image, depth1 = show_point_depth(point1, depth_image, color_image)
