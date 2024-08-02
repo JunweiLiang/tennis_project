@@ -31,7 +31,7 @@ def show_point_depth(point, depth_image, color_image):
         color_image, "d: %smm" % depth,
         (point[1] - 10, point[0]), cv2.FONT_HERSHEY_SIMPLEX,
         fontScale=1, color=(0, 255, 0), thickness=2)
-    return color_image
+    return color_image, depth
 
 
 if __name__ == "__main__":
@@ -99,11 +99,17 @@ if __name__ == "__main__":
             #print(depth_image[240, 320]) # 单位：毫米
 
             # showing two points' depth
-            point1 = (200, 300)
+            point1 = (150, 320)
             point2 = (240, 320)
 
-            color_image = show_point_depth(point1, depth_image, color_image)
-            color_image = show_point_depth(point2, depth_image, color_image)
+            color_image, depth1 = show_point_depth(point1, depth_image, color_image)
+            color_image, depth2 = show_point_depth(point2, depth_image, color_image)
+
+            # rs2_deproject_pixel_to_point takes pixel (x, y)
+            # outputs (x, y, z), the coordinates are in meters
+            point1_3d = rs.rs2_deproject_pixel_to_point(depth_intrin, (point1[1], point1[0]), depth1)
+            point2_3d = rs.rs2_deproject_pixel_to_point(depth_intrin, (point2[1], point2[0]), depth1)
+            print(point1_3d, point2_3d)
 
             # Apply colormap on depth image (image must be converted to 8-bit per pixel first)
             depth_colormap = cv2.applyColorMap(cv2.convertScaleAbs(depth_image, alpha=0.03), cv2.COLORMAP_JET)
