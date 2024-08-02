@@ -25,7 +25,7 @@ def show_point_depth(point, depth_image, color_image):
         color_image, point, radius=2, color=(0, 255, 0), thickness=2)
     color_image = cv2.putText(
         color_image, "d: %smm" % depth,
-        (point[0], point[1] - 10), cv2.FONT_HERSHEY_SIMPLEX
+        (point[0], point[1] - 10), cv2.FONT_HERSHEY_SIMPLEX,
         fontScale=1, color=(0, 255, 0), thickness=2)
     return color_image
 
