@@ -120,12 +120,14 @@ if __name__ == "__main__":
             # 也就是说3D世界的坐标如何与相机上的像素坐标互相转换的
             point1_3d = rs.rs2_deproject_pixel_to_point(depth_intrin, (point1[1], point1[0]), depth1)
             point2_3d = rs.rs2_deproject_pixel_to_point(depth_intrin, (point2[1], point2[0]), depth2)
+
+            # 计算这两点的实际距离
             #print(point1_3d, point2_3d)
             dist_between_point1_point2 = np.linalg.norm(np.array(point1_3d) - np.array(point2_3d))
 
             mid_point_xy = ( int((point2[1] + point1[1])/2.), int((point2[0] + point1[0])/2.) + 50)
             color_image = cv2.putText(
-                color_image, "两点距离: %.2f meters" % dist_between_point1_point2,
+                color_image, "dist 1to2: %.2f meters" % dist_between_point1_point2,
                 mid_point_xy, cv2.FONT_HERSHEY_SIMPLEX,
                 fontScale=1, color=(0, 0, 255), thickness=2)
 
