@@ -54,8 +54,10 @@ if __name__ == "__main__":
         profile = pipeline.start(config)
 
         depth_sensor = profile.get_device().first_depth_sensor()
-        depth_scale = depth_sensor.get_depth_scale()
+
         # depth_value * depth_scale -> meters
+        depth_scale = depth_sensor.get_depth_scale()  # 0.001
+
         print("Depth Scale is: " , depth_scale)
         print("aligning depth frame to RGB frames..") # depth sensor has different extrinsics with RGB sensor
         align_to = rs.stream.color
@@ -104,11 +106,17 @@ if __name__ == "__main__":
 
             color_image, depth1 = show_point_depth(point1, depth_image, color_image)
             color_image, depth2 = show_point_depth(point2, depth_image, color_image)
+            # mm to meters
+            depth1 = depth1 * depth_scale
+            depth2 = depth2 * depth_scale
 
             # rs2_deproject_pixel_to_point takes pixel (x, y)
             # outputs (x, y, z), the coordinates are in meters
+            #   [0,0,0] is the center of the camera,
+            #   See this doc for coordinate system
+            #   https://github.com/IntelRealSense/librealsense/wiki/Projection-in-RealSense-SDK-2.0?fbclid=IwAR3gogVZe824YUps88Dzp02AN_XzEm1BDb0UbmzfoYvn1qDFb7KzbIz9twU#point-coordinates
             point1_3d = rs.rs2_deproject_pixel_to_point(depth_intrin, (point1[1], point1[0]), depth1)
-            point2_3d = rs.rs2_deproject_pixel_to_point(depth_intrin, (point2[1], point2[0]), depth1)
+            point2_3d = rs.rs2_deproject_pixel_to_point(depth_intrin, (point2[1], point2[0]), depth2)
             print(point1_3d, point2_3d)
 
             # Apply colormap on depth image (image must be converted to 8-bit per pixel first)
