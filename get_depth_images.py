@@ -121,7 +121,7 @@ if __name__ == "__main__":
             point1_3d = rs.rs2_deproject_pixel_to_point(depth_intrin, (point1[1], point1[0]), depth1)
             point2_3d = rs.rs2_deproject_pixel_to_point(depth_intrin, (point2[1], point2[0]), depth2)
             #print(point1_3d, point2_3d)
-            dist_between_point1_point2 = np.linalg.norm(point1_3d - point2_3d)
+            dist_between_point1_point2 = np.linalg.norm(np.array(point1_3d) - np.array(point2_3d))
 
             mid_point_xy = ( int((point2[1] + point1[1])/2.), int((point2[0] + point1[0])/2.))
             color_image = cv2.putText(
