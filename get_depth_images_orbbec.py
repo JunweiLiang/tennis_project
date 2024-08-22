@@ -68,7 +68,7 @@ def get_point_position(data_dir, xy):
     points_y = (ymap - cy) / fy * points_z
 
     # set your workspace to crop point cloud
-    mask = (points_z &gt; 0) &amp; (points_z &lt; 1)
+    #mask = (points_z >= 0) &amp; (points_z &lt; 1)
     points = np.stack([points_x, points_y, points_z], axis=-1)
     points_origin = points
     points = points[mask].astype(np.float32)
