@@ -86,6 +86,8 @@ if __name__ == "__main__":
         while True:
             # Wait for a coherent pair of frames: depth and color
             frames = pipeline.wait_for_frames(100)  # maximum delay in milliseconds
+            if frames is None:  # during startup there may not be any frames yet
+                continue
 
             # unlike realsense, the frames should be aligned by now
             aligned_frames = frames
