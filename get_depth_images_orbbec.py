@@ -178,7 +178,7 @@ if __name__ == "__main__":
             print(depth_data.shape) # (576, 640)
             print(color_data.shape) # (1080, 1920, 3)
 
-            return
+            break
             # junwei: the color_intrin and depth_intrin are the same as they are aligned.
             #### 获取相机参数 ####
             aligned_depth_frame = aligned_frames.get_depth_frame()  # 获取对齐帧中的的depth帧
