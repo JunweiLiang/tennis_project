@@ -43,6 +43,22 @@ def get_orbbec_depth_data(orbbec_depth_frame):
     return depth_data
 
 
+def get_orbbec_color_data(orbbec_color_frame):
+    width = orbbec_color_frame.get_width()
+    height = orbbec_color_frame.get_height()
+
+    color_format = orbbec_color_frame.get_format()
+    assert color_format == "MJPG"
+    data = np.asanyarray(orbbec_color_frame.get_data())
+
+    image = np.zeros((height, width, 3), dtype=np.uint8)
+
+    image = cv2.imdecode(data, cv2.IMREAD_COLOR)
+
+    return image
+
+
+
 if __name__ == "__main__":
     args = parser.parse_args()
 
@@ -118,8 +134,8 @@ if __name__ == "__main__":
             depth_data = get_orbbec_depth_data(depth_frame)
             print(depth_data)
             print(depth_data.shape)
-            color_image = frame_to_bgr_image(color_frame)
-            print(color_image.shape)
+            color_data = get_orbbec_color_data(color_frame)
+            print(color_data.shape)
             break
 
             # junwei: the color_intrin and depth_intrin are the same as they are aligned.
