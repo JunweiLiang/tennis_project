@@ -51,8 +51,6 @@ def get_orbbec_color_data(orbbec_color_frame):
     assert color_format == OBFormat.MJPG
     data = np.asanyarray(orbbec_color_frame.get_data())
 
-    image = np.zeros((height, width, 3), dtype=np.uint8)
-
     image = cv2.imdecode(data, cv2.IMREAD_COLOR)
 
     return image
