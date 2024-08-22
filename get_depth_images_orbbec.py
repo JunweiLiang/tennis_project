@@ -193,7 +193,7 @@ if __name__ == "__main__":
 
             # Stack both images horizontally
             image = np.hstack((color_image, depth_colormap))
-            image = image_resize(image, width=1920, height=None)
+            image = image_resize(image, width=1280, height=None)
 
             # show the fps
             current_time = time.time()
