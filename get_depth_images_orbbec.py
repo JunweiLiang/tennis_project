@@ -48,7 +48,7 @@ def get_orbbec_color_data(orbbec_color_frame):
     height = orbbec_color_frame.get_height()
 
     color_format = orbbec_color_frame.get_format()
-    assert color_format == "MJPG"
+    assert color_format == OBFormat.MJPG
     data = np.asanyarray(orbbec_color_frame.get_data())
 
     image = np.zeros((height, width, 3), dtype=np.uint8)
@@ -74,6 +74,7 @@ if __name__ == "__main__":
         from pyorbbecsdk import Config
         from pyorbbecsdk import OBSensorType
         from pyorbbecsdk import OBAlignMode
+        from pyorbbecsdk import OBFormat
 
         # example from https://github.com/orbbec/pyorbbecsdk/blob/main/examples/depth_color_sync_align_viewer.py
         try:
