@@ -74,6 +74,8 @@ def main(argv):
         assert profile_list is not None
         depth_profile = profile_list.get_default_video_stream_profile()
         assert depth_profile is not None
+        #color profile : 1280x960@30_OBFormat.RGB
+        #depth profile : 640x576@15_OBFormat.Y16
         print("color profile : {}x{}@{}_{}".format(color_profile.get_width(),
                                                    color_profile.get_height(),
                                                    color_profile.get_fps(),
@@ -137,6 +139,8 @@ def main(argv):
             depth_data = depth_data.reshape((height, width))
             depth_data = depth_data * scale
             depth_data = np.uint16(depth_data)
+            print(depth_data.shape, color_image.shape)
+            break
             depth_image = cv2.cvtColor(depth_data, cv2.COLOR_BAYER_BG2GRAY)
 
             # pdb.set_trace()
