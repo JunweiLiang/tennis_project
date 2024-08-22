@@ -42,6 +42,43 @@ def get_orbbec_depth_data(orbbec_depth_frame):
 
     return depth_data
 
+def get_point_position(data_dir, xy):
+    colors = np.array(Image.open(os.path.join(data_dir, 'color.png')), dtype=np.float32) / 255.0
+    depths = np.array(Image.open(os.path.join(data_dir, 'depth.png')))
+    # pdb.set_trace()
+    # get camera intrinsics
+    # fx, fy = 927.17, 927.37
+    # cx, cy = 651.32, 349.62
+    fx, fy = 999.273682, 998.180237
+    cx, cy = 638.187988, 477.954865
+    scale = 1000.0
+    # set workspace to filter output grasps
+    xmin, xmax = -1.0, 1.0
+    ymin, ymax = -1.0, 1.0
+    # xmin, xmax = -0.19, 0.12
+    # ymin, ymax = 0.02, 0.15
+    zmin, zmax = 0.0, 1.0
+    lims = [xmin, xmax, ymin, ymax, zmin, zmax]
+
+    # get point cloud
+    xmap, ymap = np.arange(depths.shape[1]), np.arange(depths.shape[0])
+    xmap, ymap = np.meshgrid(xmap, ymap)
+    points_z = depths / scale
+    points_x = (xmap - cx) / fx * points_z
+    points_y = (ymap - cy) / fy * points_z
+
+    # set your workspace to crop point cloud
+    mask = (points_z &gt; 0) &amp; (points_z &lt; 1)
+    points = np.stack([points_x, points_y, points_z], axis=-1)
+    points_origin = points
+    points = points[mask].astype(np.float32)
+    colors = colors[mask].astype(np.float32)
+    print(points.min(axis=0), points.max(axis=0))
+
+    center = points_origin[xy[0], xy[1]]
+    print('point:', center)
+
+    return center
 
 def get_orbbec_color_data(orbbec_color_frame):
     #width = orbbec_color_frame.get_width()

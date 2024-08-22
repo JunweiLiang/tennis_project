@@ -1,17 +1,5 @@
 # ******************************************************************************
-#  Copyright (c) 2023 Orbbec 3D Technology, Inc
-#  
-#  Licensed under the Apache License, Version 2.0 (the "License");
-#  you may not use this file except in compliance with the License.  
-#  You may obtain a copy of the License at
-#  
-#      http:# www.apache.org/licenses/LICENSE-2.0
-#  
-#  Unless required by applicable law or agreed to in writing, software
-#  distributed under the License is distributed on an "AS IS" BASIS,
-#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#  See the License for the specific language governing permissions and
-#  limitations under the License.
+# modified by Teli Ma
 # ******************************************************************************
 import argparse
 import sys
@@ -27,7 +15,6 @@ from pyorbbecsdk import OBFormat, OBConvertFormat
 # from utils import frame_to_bgr_image
 import pdb
 import os
-import png
 
 ESC_KEY = 27
 
@@ -99,6 +86,7 @@ def main(argv):
     except Exception as e:
         print(e)
         return
+    return
     if align_mode == 'HW':
         if device_pid == 0x066B:
             # Femto Mega does not support hardware D2C, and it is changed to software D2C
@@ -161,7 +149,7 @@ def main(argv):
             # depth_image = cv2.addWeighted(color_image, 0.5, depth_image, 0.5, 0)
             cv2.imshow('color ', color_image)
             cv2.imshow("depth ", depth_image)
-            print(color_image, depth_image)
+            print(color_image.shape, depth_image.shape)  # same HW
             # cv2.imshow('depth ', depth_data)
             #cv2.imwrite(os.path.join(save_path, 'color.png'), color_image)
             #cv2.imwrite(os.path.join(save_path, 'depth.png'), depth_image)
