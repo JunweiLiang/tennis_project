@@ -59,10 +59,12 @@ if __name__ == "__main__":
             config.enable_stream(color_profile)
             config.enable_stream(depth_profile)
 
+            # color profile : 1920x1080@15_OBFormat.MJPG
             print("color profile : {}x{}@{}_{}".format(color_profile.get_width(),
                                                    color_profile.get_height(),
                                                    color_profile.get_fps(),
                                                    color_profile.get_format()))
+            # depth profile : 640x576@15_OBFormat.Y16
             print("depth profile : {}x{}@{}_{}".format(depth_profile.get_width(),
                                                    depth_profile.get_height(),
                                                    depth_profile.get_fps(),
@@ -71,6 +73,8 @@ if __name__ == "__main__":
 
             config.set_align_mode(OBAlignMode.HW_MODE)
             pipeline.enable_frame_sync()
+
+            pipeline.start(config)
 
         except Exception as e:
             print(e)
@@ -86,7 +90,7 @@ if __name__ == "__main__":
         while True:
             # Wait for a coherent pair of frames: depth and color
             frames = pipeline.wait_for_frames(100)  # maximum delay in milliseconds
-            if frames is None:  # during startup there may not be any frames yet
+            if frames is None:
                 continue
 
             # unlike realsense, the frames should be aligned by now
