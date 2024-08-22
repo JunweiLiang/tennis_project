@@ -139,8 +139,9 @@ def main(argv):
             depth_data = depth_data.reshape((height, width))
             depth_data = depth_data * scale
             depth_data = np.uint16(depth_data)
-            print(depth_data.shape, color_image.shape)
-            break
+            # (960, 1280) (960, 1280, 3)
+            #print(depth_data.shape, color_image.shape)
+            #break
             depth_image = cv2.cvtColor(depth_data, cv2.COLOR_BAYER_BG2GRAY)
 
             # pdb.set_trace()

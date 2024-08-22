@@ -81,16 +81,17 @@ def get_point_position(data_dir, xy):
     return center
 
 def get_orbbec_color_data(orbbec_color_frame):
-    #width = orbbec_color_frame.get_width()
-    #height = orbbec_color_frame.get_height()
-
+    # in BGR order
+    width = orbbec_color_frame.get_width()
+    height = orbbec_color_frame.get_height()
     color_format = orbbec_color_frame.get_format()
-    assert color_format == OBFormat.MJPG
 
-    data = np.asanyarray(orbbec_color_frame.get_data())
+    assert color_format in [OBFormat.RGB]
 
-    # (H, W, 3), uint8
-    image = cv2.imdecode(data, cv2.IMREAD_COLOR)  # in BGR
+    if color_format == OBFormat.RGB:
+        data = np.asanyarray(orbbec_color_frame.get_data())
+        image = np.resize(data, (height, width, 3))
+        image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
 
     return image
 
@@ -112,19 +113,21 @@ if __name__ == "__main__":
         from pyorbbecsdk import OBSensorType
         from pyorbbecsdk import OBAlignMode
         from pyorbbecsdk import OBFormat
+        from pyorbbecsdk import FrameSet
 
         # example from https://github.com/orbbec/pyorbbecsdk/blob/main/examples/depth_color_sync_align_viewer.py
         try:
             pipeline = Pipeline()
             config = Config()
 
-            color_profile = pipeline.get_stream_profile_list(OBSensorType.COLOR_SENSOR).get_default_video_stream_profile()
+            # 1920x1080 only supports 15 fps for Femolt Bolt
+            color_profile = pipeline.get_stream_profile_list(OBSensorType.COLOR_SENSOR).get_video_stream_profile(1280, 960, OBFormat.RGB, 30)
             depth_profile = pipeline.get_stream_profile_list(OBSensorType.DEPTH_SENSOR).get_default_video_stream_profile()
 
-            config.enable_stream(color_profile)
-            config.enable_stream(depth_profile)
 
-            # color profile : 1920x1080@15_OBFormat.MJPG
+
+            # color profile : 1920x1080@15_OBFormat.RGB
+            # default color profile : 1280x960@30_OBFormat.MJPG
             print("color profile : {}x{}@{}_{}".format(color_profile.get_width(),
                                                    color_profile.get_height(),
                                                    color_profile.get_fps(),
@@ -136,9 +139,10 @@ if __name__ == "__main__":
                                                    depth_profile.get_format()))
 
 
+            config.enable_stream(color_profile)
+            config.enable_stream(depth_profile)
             config.set_align_mode(OBAlignMode.HW_MODE)
             pipeline.enable_frame_sync()
-
             pipeline.start(config)
 
         except Exception as e:
@@ -154,7 +158,7 @@ if __name__ == "__main__":
     try:
         while True:
             # Wait for a coherent pair of frames: depth and color
-            frames = pipeline.wait_for_frames(100)  # maximum delay in milliseconds
+            frames: FrameSet = pipeline.wait_for_frames(100)  # maximum delay in milliseconds
             if frames is None:
                 continue
 
@@ -171,8 +175,8 @@ if __name__ == "__main__":
             depth_data = get_orbbec_depth_data(depth_frame)
             color_data = get_orbbec_color_data(color_frame)
             #print(depth_data[depth_data != 0]) # in 毫米
-            #print(depth_data.shape) # (576, 640)
-            #print(color_data.shape) # (1080, 1920, 3)
+            print(depth_data.shape) # (576, 640)
+            print(color_data.shape) # (1080, 1920, 3)
 
             return
             # junwei: the color_intrin and depth_intrin are the same as they are aligned.
