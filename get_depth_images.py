@@ -7,6 +7,9 @@ import cv2
 import sys
 import argparse
 import numpy as np
+import time # for fps compute
+
+from utils import image_resize
 
 parser = argparse.ArgumentParser()
 
@@ -25,7 +28,7 @@ def show_point_depth(point, depth_image, color_image):
         color_image,
         (point[1], point[0]), radius=2, color=(0, 255, 0), thickness=2)
     color_image = cv2.putText(
-        color_image, "depth: %smm" % depth,
+        color_image, "depth: %dmm" % int(depth),
         (point[1], point[0]-20), cv2.FONT_HERSHEY_SIMPLEX,
         fontScale=1, color=(0, 255, 0), thickness=2)
     return color_image, depth
@@ -66,6 +69,8 @@ if __name__ == "__main__":
 
 
     print("Now showing the camera stream. press Q to exit.")
+    start_time = time.time()
+    frame_count = 0
     try:
         while True:
             # Wait for a coherent pair of frames: depth and color
@@ -133,6 +138,17 @@ if __name__ == "__main__":
 
             # Stack both images horizontally
             image = np.hstack((color_image, depth_colormap))
+
+            image = image_resize(image, width=1920, height=None)
+
+            # show the fps
+            current_time = time.time()
+            frame_count += 1
+            fps = frame_count / (current_time - start_time)
+            image = cv2.putText(
+                image, "FPS: %d" % int(fps),
+                (10, 30), cv2.FONT_HERSHEY_SIMPLEX,
+                fontScale=1, color=(0, 0, 255), thickness=2)
 
             # Show the image
             cv2.imshow('RGB and Depth Stream', image)
