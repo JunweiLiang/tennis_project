@@ -88,7 +88,7 @@ def main(argv):
     except Exception as e:
         print(e)
         return
-    return
+
     if align_mode == 'HW':
         if device_pid == 0x066B:
             # Femto Mega does not support hardware D2C, and it is changed to software D2C
