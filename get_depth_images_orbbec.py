@@ -132,12 +132,12 @@ if __name__ == "__main__":
 
             # Convert images to numpy arrays
             depth_data = get_orbbec_depth_data(depth_frame)
-            print(depth_data[depth_data != 0])
-            print(depth_data.shape)
             color_data = get_orbbec_color_data(color_frame)
-            print(color_data.shape)
-            break
+            #print(depth_data[depth_data != 0]) # in 毫米
+            #print(depth_data.shape) # (576, 640)
+            #print(color_data.shape) # (1080, 1920, 3)
 
+            return
             # junwei: the color_intrin and depth_intrin are the same as they are aligned.
             #### 获取相机参数 ####
             aligned_depth_frame = aligned_frames.get_depth_frame()  # 获取对齐帧中的的depth帧
