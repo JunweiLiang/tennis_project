@@ -74,7 +74,6 @@ if __name__ == "__main__":
         from pyorbbecsdk import Config
         from pyorbbecsdk import OBSensorType
         from pyorbbecsdk import OBAlignMode
-        from pyorbbecsdk import frame_to_bgr_image
 
         # example from https://github.com/orbbec/pyorbbecsdk/blob/main/examples/depth_color_sync_align_viewer.py
         try:
