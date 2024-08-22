@@ -113,7 +113,6 @@ if __name__ == "__main__":
         from pyorbbecsdk import OBSensorType
         from pyorbbecsdk import OBAlignMode
         from pyorbbecsdk import OBFormat
-        from pyorbbecsdk import FrameSet
 
         # example from https://github.com/orbbec/pyorbbecsdk/blob/main/examples/depth_color_sync_align_viewer.py
         try:
@@ -141,6 +140,7 @@ if __name__ == "__main__":
 
             config.enable_stream(color_profile)
             config.enable_stream(depth_profile)
+            # HW_MODE does not work for Femolt Bolt
             config.set_align_mode(OBAlignMode.SW_MODE)
             pipeline.enable_frame_sync()
             pipeline.start(config)
@@ -158,7 +158,7 @@ if __name__ == "__main__":
     try:
         while True:
             # Wait for a coherent pair of frames: depth and color
-            frames: FrameSet = pipeline.wait_for_frames(100)  # maximum delay in milliseconds
+            frames = pipeline.wait_for_frames(100)  # maximum delay in milliseconds
             if frames is None:
                 continue
 
