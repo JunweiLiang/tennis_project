@@ -31,6 +31,17 @@ def show_point_depth(point, depth_image, color_image):
         fontScale=1, color=(0, 255, 0), thickness=2)
     return color_image, depth
 
+def get_orbbec_depth_data(orbbec_depth_frame):
+    width = orbbec_depth_frame.get_width()
+    height = orbbec_depth_frame.get_height()
+    scale = orbbec_depth_frame.get_depth_scale()
+
+    depth_data = np.frombuffer(depth_frame.get_data(), dtype=np.uint16)
+    depth_data = depth_data.reshape((height, width))
+    depth_data = depth_data.astype(np.float32) * scale
+
+    return depth_data
+
 
 if __name__ == "__main__":
     args = parser.parse_args()
@@ -47,6 +58,7 @@ if __name__ == "__main__":
         from pyorbbecsdk import Config
         from pyorbbecsdk import OBSensorType
         from pyorbbecsdk import OBAlignMode
+        from pyorbbecsdk import frame_to_bgr_image
 
         # example from https://github.com/orbbec/pyorbbecsdk/blob/main/examples/depth_color_sync_align_viewer.py
         try:
@@ -102,13 +114,11 @@ if __name__ == "__main__":
             if not depth_frame or not color_frame:
                 continue
 
-            scale = depth_frame.get_depth_scale()
-
             # Convert images to numpy arrays
-            depth_image = np.frombuffer(depth_frame.get_data(), dtype=np.uint16)
-            print(depth_image)
-            print(depth_image.shape)
-            color_image = np.asanyarray(color_frame.get_data())
+            depth_data = get_orbbec_depth_data(depth_frame)
+            print(depth_data)
+            print(depth_data.shape)
+            color_image = frame_to_bgr_image(color_frame)
             print(color_image.shape)
             break
 
