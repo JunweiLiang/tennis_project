@@ -141,7 +141,7 @@ if __name__ == "__main__":
 
             config.enable_stream(color_profile)
             config.enable_stream(depth_profile)
-            config.set_align_mode(OBAlignMode.HW_MODE)
+            config.set_align_mode(OBAlignMode.SW_MODE)
             pipeline.enable_frame_sync()
             pipeline.start(config)
 
