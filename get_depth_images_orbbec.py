@@ -44,14 +44,16 @@ def get_orbbec_depth_data(orbbec_depth_frame):
 
 
 def get_orbbec_color_data(orbbec_color_frame):
-    width = orbbec_color_frame.get_width()
-    height = orbbec_color_frame.get_height()
+    #width = orbbec_color_frame.get_width()
+    #height = orbbec_color_frame.get_height()
 
     color_format = orbbec_color_frame.get_format()
     assert color_format == OBFormat.MJPG
+
     data = np.asanyarray(orbbec_color_frame.get_data())
 
-    image = cv2.imdecode(data, cv2.IMREAD_COLOR)
+    # (H, W, 3), uint8
+    image = cv2.imdecode(data, cv2.IMREAD_COLOR)  # in BGR
 
     return image
 
@@ -130,7 +132,7 @@ if __name__ == "__main__":
 
             # Convert images to numpy arrays
             depth_data = get_orbbec_depth_data(depth_frame)
-            print(depth_data)
+            print(depth_data[depth_data != 0])
             print(depth_data.shape)
             color_data = get_orbbec_color_data(color_frame)
             print(color_data.shape)
