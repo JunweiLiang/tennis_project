@@ -144,9 +144,17 @@ if __name__ == "__main__":
             config.enable_stream(color_profile)
             config.enable_stream(depth_profile)
             # HW_MODE does not work for Femolt Bolt
-            config.set_align_mode(OBAlignMode.SW_MODE)
+            config.set_align_mode(OBAlignMode.SW_MODE) # align depth to the color image, at 15 fps
+
             pipeline.enable_frame_sync()
             pipeline.start(config)
+
+            camera_param = pipeline.get_camera_param()
+            print(camera_param.depth_intrinsic)
+            print(camera_param.rgb_intrinsic)
+            print(camera_param.depth_distortion)
+            print(camera_param.rgb_distortion)
+            print(camera_param.transform)
 
         except Exception as e:
             print(e)
@@ -156,7 +164,7 @@ if __name__ == "__main__":
         print("not supported camera.")
         sys.exit()
 
-
+    sys.exit()
     print("Now showing the camera stream. press Q to exit.")
     start_time = time.time()
     frame_count = 0
