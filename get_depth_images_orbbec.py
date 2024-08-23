@@ -62,56 +62,47 @@ def get_orbbec_color_data(orbbec_color_frame):
     return image
 
 def deproject_pixel_to_point(camera_param, xy, depth):
+    # this is the opposite process of perspective project (3D to 2D), hence "deproject"
+    # see slide 23-36 from AIAA 5036 Lecture 4
+    #   https://hkust-aiaa5036.github.io/spring2024/lecs.html
+    # remember the key formulation: Pc = K Rt Pw (Pc is the pixel coor (homogenous), Pw is the world coor)
+    # so Pw = Pc dot K (transposed), supposing we dont care about extrinsics
     # assuming depth is in meters
     x, y = xy
     fx, fy = camera_param.rgb_intrinsic.fx, camera_param.rgb_intrinsic.fy
     cx, cy = camera_param.rgb_intrinsic.cx, camera_param.rgb_intrinsic.cy
 
+    # See Slide 28
+    # see also https://stackoverflow.com/questions/38909696/2d-coordinate-to-3d-world-coordinate/38914061#38914061
     x_3d = depth / fx * (x - cx)
     y_3d = depth / fy * (y - cy)
 
     return [x_3d, y_3d, depth]
 
+def deproject_pixel_to_point_matmul(camera_param, xy, depth):
+    intrinsic = np.identity(3) # [1 0 0][0 1 0][0 0 1]
+    # focal length
+    intrinsic[0, 0] = camera_param.rgb_intrinsic.fx
+    intrinsic[1, 1] = camera_param.rgb_intrinsic.fy
+    # center of image
+    intrinsic[0, 2] = camera_param.rgb_intrinsic.cx
+    intrinsic[1, 2] = camera_param.rgb_intrinsic.cy
+
+    # get Homogenous coordinates of 2D point camera
+    x, y = xy
+    p_c_H = np.array([x, y, 1.]).reshape(3, 1) # shape: (3, N), N=1
+
+    # so 3D point in the camera coordinate frame is given by:
+    # tensor shape changes: 3x3 matmul 3xN -> 3xN
+    p_c_w = np.matmul(np.linalg.inv(intrinsic), p_c_H) * depth
+
+    # now you can do np.dot(camera_Rt, p_c_w_H) to get 3D point in the world coordinate frame
+
+    # See also an example for CARLA is here: https://github.com/JunweiLiang/Multiverse/blob/master/forking_paths_dataset/code/utils.py#L205
+
+    return list(p_c_w)
 
 
-def get_point_position(data_dir, xy):
-    # by Teli
-    colors = np.array(Image.open(os.path.join(data_dir, 'color.png')), dtype=np.float32) / 255.0
-    depths = np.array(Image.open(os.path.join(data_dir, 'depth.png')))
-    # pdb.set_trace()
-    # get camera intrinsics
-    # fx, fy = 927.17, 927.37
-    # cx, cy = 651.32, 349.62
-    fx, fy = 999.273682, 998.180237
-    cx, cy = 638.187988, 477.954865
-    scale = 1000.0
-    # set workspace to filter output grasps
-    xmin, xmax = -1.0, 1.0
-    ymin, ymax = -1.0, 1.0
-    # xmin, xmax = -0.19, 0.12
-    # ymin, ymax = 0.02, 0.15
-    zmin, zmax = 0.0, 1.0
-    lims = [xmin, xmax, ymin, ymax, zmin, zmax]
-
-    # get point cloud
-    xmap, ymap = np.arange(depths.shape[1]), np.arange(depths.shape[0])
-    xmap, ymap = np.meshgrid(xmap, ymap)
-    points_z = depths / scale
-    points_x = (xmap - cx) / fx * points_z
-    points_y = (ymap - cy) / fy * points_z
-
-    # set your workspace to crop point cloud
-    #mask = (points_z >= 0) &amp; (points_z &lt; 1)
-    points = np.stack([points_x, points_y, points_z], axis=-1)
-    points_origin = points
-    points = points[mask].astype(np.float32)
-    colors = colors[mask].astype(np.float32)
-    print(points.min(axis=0), points.max(axis=0))
-
-    center = points_origin[xy[0], xy[1]]
-    print('point:', center)
-
-    return center
 
 
 if __name__ == "__main__":
@@ -229,6 +220,8 @@ if __name__ == "__main__":
 
             point1_3d = deproject_pixel_to_point(camera_param, (point1[1], point1[0]), depth1)
             point2_3d = deproject_pixel_to_point(camera_param, (point2[1], point2[0]), depth2)
+            point1_3d_m = deproject_pixel_to_point_matmul(camera_param, (point1[1], point1[0]), depth1)
+            print(point1_3d, point1_3d_m)
 
             # 计算这两点的实际距离
             #print(point1_3d, point2_3d)
