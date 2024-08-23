@@ -28,7 +28,7 @@ def show_point_depth(point, depth_image, color_image):
         color_image,
         (point[1], point[0]), radius=2, color=(0, 255, 0), thickness=2)
     color_image = cv2.putText(
-        color_image, "depth: %dmm" % int(depth),
+        color_image, "depth: %.3fm" % depth,
         (point[1], point[0]-20), cv2.FONT_HERSHEY_SIMPLEX,
         fontScale=1, color=(0, 255, 0), thickness=2)
     return color_image, depth
@@ -36,13 +36,12 @@ def show_point_depth(point, depth_image, color_image):
 def get_orbbec_depth_data(orbbec_depth_frame):
     width = orbbec_depth_frame.get_width()
     height = orbbec_depth_frame.get_height()
-    scale = orbbec_depth_frame.get_depth_scale()
-    print(scale)
-    sys.exit()
+    scale = orbbec_depth_frame.get_depth_scale() # scale is 1.0, the HW are in milimeters
+    scale = 0.001 # I want them in meters
 
     depth_data = np.frombuffer(depth_frame.get_data(), dtype=np.uint16)
     depth_data = depth_data.reshape((height, width))
-    depth_data = depth_data.astype(np.float32)# * scale
+    depth_data = depth_data.astype(np.float32) * scale
 
     return depth_data
 
@@ -203,7 +202,7 @@ if __name__ == "__main__":
             # Convert images to numpy arrays
             depth_data = get_orbbec_depth_data(depth_frame)
             color_data = get_orbbec_color_data(color_frame)
-            #print(depth_data[depth_data != 0]) # in 毫米
+            #print(depth_data[depth_data != 0]) # in 米
             #print(depth_data.shape) # (960, 1280)
             #print(color_data.shape) # (960, 1280, 3)
 
