@@ -150,11 +150,24 @@ if __name__ == "__main__":
             pipeline.start(config)
 
             camera_param = pipeline.get_camera_param()
+
+            # 坐标系原点设置： https://www.orbbec.com/documentation-mega/coordinate-systems/
             print(camera_param.depth_intrinsic)
             print(camera_param.rgb_intrinsic)
             print(camera_param.depth_distortion)
             print(camera_param.rgb_distortion)
             print(camera_param.transform)
+
+            print(camera_param.rgb_intrinsic.fx)
+
+            """
+            <OBCameraIntrinsic fx=997.648743 fy=996.949890 cx=632.307373 cy=490.477325 width=1280 height=960>
+            <OBCameraIntrinsic fx=997.648743 fy=996.949890 cx=632.307373 cy=490.477325 width=1280 height=960>
+            <OBCameraDistortion k1=0.073824 k2=-0.100994 k3=0.040822 k4=0.000000 k5=0.000000 k6=0.000000 p1=-0.000142 p2=-0.000074>
+            <OBCameraDistortion k1=0.073824 k2=-0.100994 k3=0.040822 k4=0.000000 k5=0.000000 k6=0.000000 p1=-0.000142 p2=-0.000074>
+            <OBD2CTransform rot=[1, 0, 0, 0, 1, 0, 0, 0, 1]
+            transform=[0, 0, 0]
+            """
 
         except Exception as e:
             print(e)
