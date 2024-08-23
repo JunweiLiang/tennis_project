@@ -36,7 +36,9 @@ def show_point_depth(point, depth_image, color_image):
 def get_orbbec_depth_data(orbbec_depth_frame):
     width = orbbec_depth_frame.get_width()
     height = orbbec_depth_frame.get_height()
-    #scale = orbbec_depth_frame.get_depth_scale()
+    scale = orbbec_depth_frame.get_depth_scale()
+    print(scale)
+    sys.exit()
 
     depth_data = np.frombuffer(depth_frame.get_data(), dtype=np.uint16)
     depth_data = depth_data.reshape((height, width))
