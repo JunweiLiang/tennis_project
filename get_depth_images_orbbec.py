@@ -61,8 +61,20 @@ def get_orbbec_color_data(orbbec_color_frame):
 
     return image
 
+def deproject_pixel_to_point(camera_param, xy, depth):
+    x, y = xy
+    fx, fy = camera_param.rgb_intrinsic.fx, camera_param.rgb_intrinsic.fy
+    cx, cy = camera_param.rgb_intrinsic.cx, camera_param.rgb_intrinsic.cy
+
+    x_3d = depth / fx * (x - cx)
+    y_3d = depth / fy * (y - cy)
+
+    return [x_3d, y_3d, depth]
+
+
 
 def get_point_position(data_dir, xy):
+    # by Teli
     colors = np.array(Image.open(os.path.join(data_dir, 'color.png')), dtype=np.float32) / 255.0
     depths = np.array(Image.open(os.path.join(data_dir, 'depth.png')))
     # pdb.set_trace()
@@ -213,6 +225,19 @@ if __name__ == "__main__":
             # depth in mm
             color_image, depth1 = show_point_depth(point1, depth_data, color_data)
             color_image, depth2 = show_point_depth(point2, depth_data, color_data)
+
+            point1_3d = deproject_pixel_to_point(camera_param, (point1[1], point1[0]), depth1)
+            point2_3d = deproject_pixel_to_point(camera_param, (point2[1], point2[0]), depth2)
+
+            # 计算这两点的实际距离
+            #print(point1_3d, point2_3d)
+            dist_between_point1_point2 = np.linalg.norm(np.array(point1_3d) - np.array(point2_3d))
+
+            mid_point_xy = ( int((point2[1] + point1[1])/2.), int((point2[0] + point1[0])/2.) + 50)
+            color_image = cv2.putText(
+                color_image, "dist 1to2: %.2f meters" % dist_between_point1_point2,
+                mid_point_xy, cv2.FONT_HERSHEY_SIMPLEX,
+                fontScale=1, color=(0, 0, 255), thickness=2)
 
             # Apply colormap on depth image (image must be converted to 8-bit per pixel first)
             depth_colormap = cv2.applyColorMap(cv2.convertScaleAbs(depth_data, alpha=0.03), cv2.COLORMAP_JET)
