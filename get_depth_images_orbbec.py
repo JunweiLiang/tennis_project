@@ -102,6 +102,25 @@ def deproject_pixel_to_point_matmul(camera_param, xy, depth):
 
     return p_c_w.squeeze().tolist()
 
+def deproject_pixel_to_point_undistorted(camera_param, xy, depth):
+    # TODO: undistort the pixel coordinates given the distortion parameters
+    """
+    1.  Initial Assumptions:
+    •   The pixel coordinates (x, y) given are the distorted coordinates.
+    •   The depth z is provided.
+    2.  Convert Pixel Coordinates to Normalized Camera Coordinates:
+    Convert the distorted pixel coordinates (x_d, y_d) to normalized coordinates
+
+    3.  Undistort the Coordinates:
+    The undistortion process generally involves an iterative approach to find the undistorted coordinates (x_u, y_u) from the distorted coordinates (x_d, y_d). This is because the distortion equations are nonlinear.
+    The goal is to find (x_u, y_u) such that:
+
+    The undistortion process can be computed using a numerical method such as Newton’s method, or using libraries like OpenCV, which has functions for undistorting points.
+
+    4.  Transform to 3D Coordinates:
+    Once you have the undistorted normalized coordinates (x_u, y_u), you can convert them to 3D coordinates as before:
+
+    """
 
 
 
