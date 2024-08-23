@@ -100,7 +100,7 @@ def deproject_pixel_to_point_matmul(camera_param, xy, depth):
 
     # See also an example for CARLA is here: https://github.com/JunweiLiang/Multiverse/blob/master/forking_paths_dataset/code/utils.py#L205
 
-    return p_c_w.tolist()
+    return p_c_w.squeece().tolist()
 
 
 
@@ -222,7 +222,7 @@ if __name__ == "__main__":
             point2_3d = deproject_pixel_to_point(camera_param, (point2[1], point2[0]), depth2)
             point1_3d_m = deproject_pixel_to_point_matmul(camera_param, (point1[1], point1[0]), depth1)
             print(point1_3d, point1_3d_m)
-            assert(point1_3d == point1_3d_m)
+            np.testing.assert_allclose(point1_3d, point1_3d_m)
 
             # 计算这两点的实际距离
             #print(point1_3d, point2_3d)
