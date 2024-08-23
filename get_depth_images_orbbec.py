@@ -36,11 +36,11 @@ def show_point_depth(point, depth_image, color_image):
 def get_orbbec_depth_data(orbbec_depth_frame):
     width = orbbec_depth_frame.get_width()
     height = orbbec_depth_frame.get_height()
-    scale = orbbec_depth_frame.get_depth_scale()
+    #scale = orbbec_depth_frame.get_depth_scale()
 
     depth_data = np.frombuffer(depth_frame.get_data(), dtype=np.uint16)
     depth_data = depth_data.reshape((height, width))
-    depth_data = depth_data.astype(np.float32) * scale
+    depth_data = depth_data.astype(np.float32)# * scale
 
     return depth_data
 
@@ -152,6 +152,8 @@ if __name__ == "__main__":
             camera_param = pipeline.get_camera_param()
 
             # 坐标系原点设置： https://www.orbbec.com/documentation-mega/coordinate-systems/
+            # camera param 获取: https://github.com/orbbec/pyorbbecsdk/blob/main/test/test_pipeline.py#L35
+            """
             print(camera_param.depth_intrinsic)
             print(camera_param.rgb_intrinsic)
             print(camera_param.depth_distortion)
@@ -160,13 +162,13 @@ if __name__ == "__main__":
 
             print(camera_param.rgb_intrinsic.fx)
 
-            """
             <OBCameraIntrinsic fx=997.648743 fy=996.949890 cx=632.307373 cy=490.477325 width=1280 height=960>
             <OBCameraIntrinsic fx=997.648743 fy=996.949890 cx=632.307373 cy=490.477325 width=1280 height=960>
             <OBCameraDistortion k1=0.073824 k2=-0.100994 k3=0.040822 k4=0.000000 k5=0.000000 k6=0.000000 p1=-0.000142 p2=-0.000074>
             <OBCameraDistortion k1=0.073824 k2=-0.100994 k3=0.040822 k4=0.000000 k5=0.000000 k6=0.000000 p1=-0.000142 p2=-0.000074>
             <OBD2CTransform rot=[1, 0, 0, 0, 1, 0, 0, 0, 1]
             transform=[0, 0, 0]
+            997.6487426757812
             """
 
         except Exception as e:
@@ -177,7 +179,6 @@ if __name__ == "__main__":
         print("not supported camera.")
         sys.exit()
 
-    sys.exit()
     print("Now showing the camera stream. press Q to exit.")
     start_time = time.time()
     frame_count = 0
@@ -204,10 +205,13 @@ if __name__ == "__main__":
             #print(depth_data.shape) # (960, 1280)
             #print(color_data.shape) # (960, 1280, 3)
 
-            # 1. print out the depth at the center
-            point1 = (480, 640)  # (y, x)
+            # showing two points' depth
+            point1 = (400, 400)  # (y, x)
+            point2 = (480, 640)
 
+            # depth in mm
             color_image, depth1 = show_point_depth(point1, depth_data, color_data)
+            color_image, depth2 = show_point_depth(point2, depth_data, color_data)
 
             # Apply colormap on depth image (image must be converted to 8-bit per pixel first)
             depth_colormap = cv2.applyColorMap(cv2.convertScaleAbs(depth_data, alpha=0.03), cv2.COLORMAP_JET)
