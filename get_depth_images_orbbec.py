@@ -30,7 +30,7 @@ def show_point_depth(point, depth_image, color_image):
     color_image = cv2.putText(
         color_image, "depth: %.3fm" % depth,
         (point[1], point[0]-20), cv2.FONT_HERSHEY_SIMPLEX,
-        fontScale=1, color=(0, 255, 0), thickness=4)
+        fontScale=2, color=(0, 255, 0), thickness=4)
     return color_image, depth
 
 def get_orbbec_depth_data(orbbec_depth_frame):
@@ -238,7 +238,7 @@ if __name__ == "__main__":
             color_image = cv2.putText(
                 color_image, "dist 1to2: %.2f meters" % dist_between_point1_point2,
                 mid_point_xy, cv2.FONT_HERSHEY_SIMPLEX,
-                fontScale=1, color=(0, 0, 255), thickness=2)
+                fontScale=2, color=(0, 0, 255), thickness=2)
 
             # Apply colormap on depth image (image must be converted to 8-bit per pixel first)
             depth_colormap = cv2.applyColorMap(cv2.convertScaleAbs(depth_data, alpha=0.03), cv2.COLORMAP_JET)
