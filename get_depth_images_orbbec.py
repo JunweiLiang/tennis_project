@@ -241,7 +241,7 @@ if __name__ == "__main__":
                 fontScale=2, color=(0, 0, 255), thickness=2)
 
             # Apply colormap on depth image (image must be converted to 8-bit per pixel first)
-            depth_colormap = cv2.applyColorMap(cv2.convertScaleAbs(depth_data, alpha=0.03), cv2.COLORMAP_JET)
+            depth_colormap = cv2.applyColorMap(cv2.convertScaleAbs(depth_data*1000., alpha=0.03), cv2.COLORMAP_JET)
 
             # Stack both images horizontally
             image = np.hstack((color_image, depth_colormap))
