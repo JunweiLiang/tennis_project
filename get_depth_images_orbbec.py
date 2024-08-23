@@ -80,6 +80,8 @@ def deproject_pixel_to_point(camera_param, xy, depth):
     return [x_3d, y_3d, depth]
 
 def deproject_pixel_to_point_matmul(camera_param, xy, depth):
+    # compute intrinsic matrix from field of view and image size:
+    #   https://github.com/JunweiLiang/Multiverse/blob/master/forking_paths_dataset/code/utils.py#L930
     intrinsic = np.identity(3) # [1 0 0][0 1 0][0 0 1]
     # focal length
     intrinsic[0, 0] = camera_param.rgb_intrinsic.fx
