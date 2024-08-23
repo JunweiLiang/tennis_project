@@ -26,11 +26,11 @@ def show_point_depth(point, depth_image, color_image):
     depth = depth_image[point[0], point[1]]  # in milimeters
     color_image = cv2.circle(
         color_image,
-        (point[1], point[0]), radius=2, color=(0, 255, 0), thickness=2)
+        (point[1], point[0]), radius=2, color=(0, 255, 0), thickness=4)
     color_image = cv2.putText(
         color_image, "depth: %.3fm" % depth,
         (point[1], point[0]-20), cv2.FONT_HERSHEY_SIMPLEX,
-        fontScale=1, color=(0, 255, 0), thickness=2)
+        fontScale=1, color=(0, 255, 0), thickness=4)
     return color_image, depth
 
 def get_orbbec_depth_data(orbbec_depth_frame):
@@ -62,6 +62,7 @@ def get_orbbec_color_data(orbbec_color_frame):
     return image
 
 def deproject_pixel_to_point(camera_param, xy, depth):
+    # assuming depth is in meters
     x, y = xy
     fx, fy = camera_param.rgb_intrinsic.fx, camera_param.rgb_intrinsic.fy
     cx, cy = camera_param.rgb_intrinsic.cx, camera_param.rgb_intrinsic.cy
@@ -233,7 +234,7 @@ if __name__ == "__main__":
             #print(point1_3d, point2_3d)
             dist_between_point1_point2 = np.linalg.norm(np.array(point1_3d) - np.array(point2_3d))
 
-            mid_point_xy = ( int((point2[1] + point1[1])/2.), int((point2[0] + point1[0])/2.) + 50)
+            mid_point_xy = ( int((point2[1] + point1[1])/2.), int((point2[0] + point1[0])/2.) + 100)
             color_image = cv2.putText(
                 color_image, "dist 1to2: %.2f meters" % dist_between_point1_point2,
                 mid_point_xy, cv2.FONT_HERSHEY_SIMPLEX,

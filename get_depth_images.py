@@ -127,7 +127,7 @@ if __name__ == "__main__":
             #print(point1_3d, point2_3d)
             dist_between_point1_point2 = np.linalg.norm(np.array(point1_3d) - np.array(point2_3d))
 
-            mid_point_xy = ( int((point2[1] + point1[1])/2.), int((point2[0] + point1[0])/2.) + 50)
+            mid_point_xy = ( int((point2[1] + point1[1])/2.), int((point2[0] + point1[0])/2.) + 100)
             color_image = cv2.putText(
                 color_image, "dist 1to2: %.2f meters" % dist_between_point1_point2,
                 mid_point_xy, cv2.FONT_HERSHEY_SIMPLEX,
