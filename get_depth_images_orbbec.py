@@ -100,7 +100,7 @@ def deproject_pixel_to_point_matmul(camera_param, xy, depth):
 
     # See also an example for CARLA is here: https://github.com/JunweiLiang/Multiverse/blob/master/forking_paths_dataset/code/utils.py#L205
 
-    return p_c_w.squeece().tolist()
+    return p_c_w.squeeze().tolist()
 
 
 
