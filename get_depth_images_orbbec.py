@@ -219,7 +219,7 @@ if __name__ == "__main__":
         if args.save_to_mp4 is not None:
             print("saving to mp4 video %s..." % args.save_to_mp4)
             fourcc = cv2.cv.CV_FOURCC('m', 'p', '4', 'v')
-            out = cv2.VideoWriter(args.save_to_mp4, fourcc, 30.0, (1280,480))
+            out = cv2.VideoWriter(args.save_to_mp4, fourcc, 30.0, (1280, 480))
 
         while True:
             # Wait for a coherent pair of frames: depth and color
@@ -254,7 +254,7 @@ if __name__ == "__main__":
             point1_3d = deproject_pixel_to_point(camera_param, (point1[1], point1[0]), depth1)
             point2_3d = deproject_pixel_to_point(camera_param, (point2[1], point2[0]), depth2)
             point1_3d_m = deproject_pixel_to_point_matmul(camera_param, (point1[1], point1[0]), depth1)
-            print(point1_3d, point1_3d_m)
+            #print(point1_3d, point1_3d_m)
             np.testing.assert_allclose(point1_3d, point1_3d_m)
 
             # 计算这两点的实际距离
