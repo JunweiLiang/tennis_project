@@ -218,7 +218,7 @@ if __name__ == "__main__":
     try:
         if args.save_to_mp4 is not None:
             print("saving to mp4 video %s..." % args.save_to_mp4)
-            fourcc = cv2.VideoWriter_fourcc('X', '2', '6', '4')
+            fourcc = cv2.VideoWriter_fourcc(*"avc1")
             out = cv2.VideoWriter(args.save_to_mp4, fourcc, 30.0, (1280, 480))
 
         while True:
