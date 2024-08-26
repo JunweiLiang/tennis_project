@@ -272,7 +272,7 @@ if __name__ == "__main__":
             # Stack both images horizontally
             image = np.hstack((color_image, depth_colormap))
             image = image_resize(image, width=1280, height=None)
-            print_once("image shape: %s" % image.shapes)
+            print_once("image shape: %s" % image.shape)
 
             if args.save_to_mp4 is not None:
                 out.write(image)
@@ -296,5 +296,6 @@ if __name__ == "__main__":
 
     finally:
         pipeline.stop()
-        out.release()
+        if args.save_to_mp4 is not None:
+            out.release()
         cv2.destroyAllWindows()
