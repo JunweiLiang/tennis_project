@@ -14,7 +14,7 @@ from utils import image_resize
 parser = argparse.ArgumentParser()
 
 parser.add_argument("--camera_type", default="realsense")
-parser.add_argument("--save_to_webm", default=None, help="save the video to a webm file")
+parser.add_argument("--save_to_avi", default=None, help="save the video to a avi file")
 
 
 # 1. example use to get an image from the laptop camera
@@ -80,11 +80,11 @@ if __name__ == "__main__":
     start_time = time.time()
     frame_count = 0
     try:
-        if args.save_to_webm is not None:
-            # writing to file will drop FPS
+        if args.save_to_avi is not None:
+
             # cannot save to mp4 file, due to liscensing problem, need to compile opencv from source
-            print("saving to webm video %s..." % args.save_to_webm)
-            fourcc = cv2.VideoWriter_fourcc(*"VP80")
+            print("saving to avi video %s..." % args.save_to_avi)
+            fourcc = cv2.VideoWriter_fourcc(*"XVID")
             out = cv2.VideoWriter(args.save_to_webm, fourcc, 30.0, (1280, 480))
 
         while True:
@@ -158,7 +158,7 @@ if __name__ == "__main__":
 
             print_once("image shape: %s" % list(image.shape[:2]))
 
-            if args.save_to_webm is not None:
+            if args.save_to_avi is not None:
                 out.write(image)
 
             # show the fps
@@ -180,6 +180,6 @@ if __name__ == "__main__":
 
     finally:
         pipeline.stop()
-        if args.save_to_webm is not None:
+        if args.save_to_avi is not None:
             out.release()
         cv2.destroyAllWindows()

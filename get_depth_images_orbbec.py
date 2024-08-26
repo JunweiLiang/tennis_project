@@ -217,7 +217,7 @@ if __name__ == "__main__":
     frame_count = 0
     try:
         if args.save_to_avi is not None:
-            # saving to webm VP80 will drop FPS
+            # saving to webm VP80 will drop FPS 15 to 10. Saving to AVI no FPS drop
             # cannot save to mp4 file, due to liscensing problem, need to compile opencv from source
             print("saving to avi video %s..." % args.save_to_avi)
             fourcc = cv2.VideoWriter_fourcc(*"XVID")
