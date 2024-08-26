@@ -14,6 +14,7 @@ from utils import image_resize
 parser = argparse.ArgumentParser()
 
 parser.add_argument("--camera_type", default="orbbec")
+parser.add_argument("--save_to_mp4", default=None, help="save the video to a mp4 file")
 
 # 1. example use to get an image from the laptop camera
 # (base) junweil@precognition-laptop2:~$ python ~/projects/tennis_project/get_depth_images.py --camera_type realsense
@@ -124,6 +125,11 @@ def deproject_pixel_to_point_undistorted(camera_param, xy, depth):
 
     """
 
+printed = False
+def print_once(string):
+    if not printed:
+        print(string)
+        printed = True
 
 
 if __name__ == "__main__":
@@ -209,6 +215,11 @@ if __name__ == "__main__":
     start_time = time.time()
     frame_count = 0
     try:
+        if args.save_to_mp4 is not None:
+            print("saving to mp4 video %s..." % args.save_to_mp4)
+            fourcc = cv2.cv.CV_FOURCC('m', 'p', '4', 'v')
+            out = cv2.VideoWriter(args.save_to_mp4, fourcc, 30.0, (1280,480))
+
         while True:
             # Wait for a coherent pair of frames: depth and color
             frames = pipeline.wait_for_frames(100)  # maximum delay in milliseconds
@@ -261,6 +272,10 @@ if __name__ == "__main__":
             # Stack both images horizontally
             image = np.hstack((color_image, depth_colormap))
             image = image_resize(image, width=1280, height=None)
+            print_once("image shape: %s" % image.shapes)
+
+            if args.save_to_mp4 is not None:
+                out.write(image)
 
             # show the fps
             current_time = time.time()
@@ -281,4 +296,5 @@ if __name__ == "__main__":
 
     finally:
         pipeline.stop()
+        out.release()
         cv2.destroyAllWindows()
