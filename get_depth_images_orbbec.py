@@ -219,7 +219,7 @@ if __name__ == "__main__":
         if args.save_to_avi is not None:
             # cannot save to mp4 file, due to liscensing problem, need to compile opencv from source
             print("saving to avi video %s..." % args.save_to_avi)
-            fourcc = cv2.VideoWriter_fourcc(*"XVID")
+            fourcc = cv2.VideoWriter_fourcc(*"VP80")
             out = cv2.VideoWriter(args.save_to_avi, fourcc, 30.0, (1280, 480))
 
         while True:
