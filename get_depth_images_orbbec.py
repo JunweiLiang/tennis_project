@@ -14,7 +14,7 @@ from utils import image_resize
 parser = argparse.ArgumentParser()
 
 parser.add_argument("--camera_type", default="orbbec")
-parser.add_argument("--save_to_mp4", default=None, help="save the video to a mp4 file")
+parser.add_argument("--save_to_avi", default=None, help="save the video to a avi file")
 
 # 1. example use to get an image from the laptop camera
 # (base) junweil@precognition-laptop2:~$ python ~/projects/tennis_project/get_depth_images.py --camera_type realsense
@@ -216,10 +216,11 @@ if __name__ == "__main__":
     start_time = time.time()
     frame_count = 0
     try:
-        if args.save_to_mp4 is not None:
-            print("saving to mp4 video %s..." % args.save_to_mp4)
-            fourcc = cv2.VideoWriter_fourcc(*"avc1")
-            out = cv2.VideoWriter(args.save_to_mp4, fourcc, 30.0, (1280, 480))
+        if args.save_to_avi is not None:
+            # cannot save to mp4 file, due to liscensing problem, need to compile opencv from source
+            print("saving to avi video %s..." % args.save_to_avi)
+            fourcc = cv2.VideoWriter_fourcc(*"XVID")
+            out = cv2.VideoWriter(args.save_to_avi, fourcc, 30.0, (1280, 480))
 
         while True:
             # Wait for a coherent pair of frames: depth and color
@@ -275,7 +276,7 @@ if __name__ == "__main__":
             image = image_resize(image, width=1280, height=None)
             print_once("image shape: %s" % list(image.shape[:2]))
 
-            if args.save_to_mp4 is not None:
+            if args.save_to_avi is not None:
                 out.write(image)
 
             # show the fps
@@ -297,6 +298,6 @@ if __name__ == "__main__":
 
     finally:
         pipeline.stop()
-        if args.save_to_mp4 is not None:
+        if args.save_to_avi is not None:
             out.release()
         cv2.destroyAllWindows()
