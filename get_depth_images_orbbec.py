@@ -127,6 +127,7 @@ def deproject_pixel_to_point_undistorted(camera_param, xy, depth):
 
 printed = False
 def print_once(string):
+    global printed
     if not printed:
         print(string)
         printed = True
