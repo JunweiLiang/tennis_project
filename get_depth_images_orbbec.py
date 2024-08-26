@@ -272,7 +272,7 @@ if __name__ == "__main__":
             # Stack both images horizontally
             image = np.hstack((color_image, depth_colormap))
             image = image_resize(image, width=1280, height=None)
-            print_once("image shape: %s" % image.shape)
+            print_once("image shape: %s" % list(image.shape[:2]))
 
             if args.save_to_mp4 is not None:
                 out.write(image)
