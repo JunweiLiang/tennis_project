@@ -11,6 +11,7 @@ import datetime
 import time # for fps compute
 
 from utils import image_resize
+from utils import print_once
 
 parser = argparse.ArgumentParser()
 
@@ -38,12 +39,6 @@ def show_point_depth(point, depth_image, color_image):
         fontScale=1, color=(0, 255, 0), thickness=2)
     return color_image, depth
 
-printed = False
-def print_once(string):
-    global printed
-    if not printed:
-        print(string)
-        printed = True
 
 if __name__ == "__main__":
     args = parser.parse_args()
@@ -98,6 +93,7 @@ if __name__ == "__main__":
         while True:
             # Wait for a coherent pair of frames: depth and color
             frames = pipeline.wait_for_frames()
+            frames.keep()  # realsense's problem
 
             # 1. we need to align the frames, so on the x,y of RGB, we get the correct depth
             aligned_frames = aligner.process(frames)
@@ -132,7 +128,6 @@ if __name__ == "__main__":
             if args.save_data_only:
                 image = color_image
                 depth_data_dict[frame_count] = depth_image
-                image = image_resize(image, width=640, height=None)
             else:
                 # for visualization
 
