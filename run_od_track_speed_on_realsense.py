@@ -111,7 +111,7 @@ def run_od_track_on_image(
         # see here for coco class indexes [0-79], 0 is person: https://gist.github.com/AruniRC/7b3dadd004da04c80198557db5da4bda
         #classes=[0, 32], # detect person and sports ball only
         conf=conf,
-        iou=0.5,
+        iou=0.7, #NMS. Lower values result in fewer detections by eliminating overlapping boxes
         persist=True
         )
 
