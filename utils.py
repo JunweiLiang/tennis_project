@@ -32,3 +32,10 @@ def image_resize(image, width = None, height = None, inter = cv2.INTER_AREA):
 
     # return the resized image
     return resized
+
+printed = False
+def print_once(string):
+    global printed
+    if not printed:
+        print(string)
+        printed = True
