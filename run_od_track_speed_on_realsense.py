@@ -117,14 +117,13 @@ def run_od_track_on_image(
 
         for box, track_id in zip(boxes, track_ids):
             x, y, w, h = box
-            print(box, track_id)
             track = track_history[track_id]
 
             bbox_color = (255, 0, 0) # BGR
 
             frame_cv2 = cv2.rectangle(
                     frame_cv2,
-                    (x, y), (x+w, y+h),
+                    (int(x), int(y)), (int(x+w), int(y+h)),
                     bbox_color, bbox_thickness)
 
             frame_cv2 = cv2.putText(
