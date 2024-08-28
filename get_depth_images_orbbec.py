@@ -153,7 +153,9 @@ if __name__ == "__main__":
 
             # 1920x1080 only supports 15 fps for Femolt Bolt
             color_profile = pipeline.get_stream_profile_list(OBSensorType.COLOR_SENSOR).get_video_stream_profile(1280, 960, OBFormat.RGB, 30)
-            depth_profile = pipeline.get_stream_profile_list(OBSensorType.DEPTH_SENSOR).get_default_video_stream_profile()
+            # Up to 1024X1024@15fps (WFOV), 640X576@30fps (NFOV)
+            #depth_profile = pipeline.get_stream_profile_list(OBSensorType.DEPTH_SENSOR).get_default_video_stream_profile()
+            depth_profile = pipeline.get_stream_profile_list(OBSensorType.DEPTH_SENSOR).get_video_stream_profile(640, 576, OBFormat.Y16, 30)
 
 
 
@@ -163,7 +165,7 @@ if __name__ == "__main__":
                                                    color_profile.get_height(),
                                                    color_profile.get_fps(),
                                                    color_profile.get_format()))
-            # depth profile : 640x576@15_OBFormat.Y16
+            # default depth profile : 640x576@15_OBFormat.Y16
             print("depth profile : {}x{}@{}_{}".format(depth_profile.get_width(),
                                                    depth_profile.get_height(),
                                                    depth_profile.get_fps(),
