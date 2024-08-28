@@ -67,21 +67,20 @@ def run_od_on_image(
 
     # see here for the API documentation of results
     # https://docs.ultralytics.com/modes/predict/#working-with-results
-    for result in results:
-        # each class?
-        for box in result.boxes:
-            bbox = [int(x) for x in box.xyxy[0]]
-            bbox_color = (0, 255, 0) # BGR
-            frame_cv2 = cv2.rectangle(
-                    frame_cv2,
-                    tuple(bbox[0:2]), tuple(bbox[2:4]),
-                    bbox_color, bbox_thickness)
+    result = results[0] # we run it on single image
+    for box in result.boxes:
+        bbox = [int(x) for x in box.xyxy[0]]
+        bbox_color = (0, 255, 0) # BGR
+        frame_cv2 = cv2.rectangle(
+                frame_cv2,
+                tuple(bbox[0:2]), tuple(bbox[2:4]),
+                bbox_color, bbox_thickness)
 
-            frame_cv2 = cv2.putText(
-                    frame_cv2, "%s" % result.names[int(box.cls[0])],
-                    (bbox[0], bbox[1] - 10),  # specify the bottom left corner
-                    cv2.FONT_HERSHEY_PLAIN, font_size,
-                    bbox_color, text_thickness)
+        frame_cv2 = cv2.putText(
+                frame_cv2, "%s" % result.names[int(box.cls[0])],
+                (bbox[0], bbox[1] - 10),  # specify the bottom left corner
+                cv2.FONT_HERSHEY_PLAIN, font_size,
+                bbox_color, text_thickness)
     return frame_cv2, results
 
 def run_od_track_on_image(
@@ -108,29 +107,29 @@ def run_od_track_on_image(
 
     # see here for the API documentation of results
     # https://docs.ultralytics.com/modes/predict/#working-with-results
-    for result in results:
-        # each class
+    result = results[0]
 
-        # Get the boxes and track IDs for ploting the lines
-        boxes = result.boxes.xywh.cpu()
-        track_ids = result.boxes.id.int().cpu().tolist()
+    # Get the boxes and track IDs for ploting the lines
+    boxes = result.boxes.xywh.cpu()
+    track_ids = result.boxes.id.int().cpu().tolist()
+    classes = result.boxes.cls.int().cpu().tolist()
 
-        for box, track_id in zip(boxes, track_ids):
-            x, y, w, h = box
-            track = track_history[track_id]
+    for box, track_id, cls_id in zip(boxes, track_ids, classes):
+        x, y, w, h = box
+        track = track_history[track_id]
 
-            bbox_color = (255, 0, 0) # BGR
+        bbox_color = (255, 0, 0) # BGR
 
-            frame_cv2 = cv2.rectangle(
-                    frame_cv2,
-                    (int(x), int(y)), (int(x+w), int(y+h)),
-                    bbox_color, bbox_thickness)
+        frame_cv2 = cv2.rectangle(
+                frame_cv2,
+                (int(x), int(y)), (int(x+w), int(y+h)),
+                bbox_color, bbox_thickness)
 
-            frame_cv2 = cv2.putText(
-                    frame_cv2, "%s #%d" % (result.names[int(box.cls[0])], track_id),
-                    (x, y - 10),  # specify the bottom left corner
-                    cv2.FONT_HERSHEY_PLAIN, font_size,
-                    bbox_color, text_thickness)
+        frame_cv2 = cv2.putText(
+                frame_cv2, "%s #%d" % (result.names[cls_id], track_id),
+                (int(x), int(y) - 10),  # specify the bottom left corner
+                cv2.FONT_HERSHEY_PLAIN, font_size,
+                bbox_color, text_thickness)
     return frame_cv2, results
 
 
