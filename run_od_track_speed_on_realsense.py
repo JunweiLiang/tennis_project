@@ -111,11 +111,13 @@ def run_od_track_on_image(
 
     # Get the boxes and track IDs for ploting the lines
     boxes = result.boxes.xywh.cpu()
+    boxes_xyxy = result.boxes.xyxy.cpu()
     track_ids = result.boxes.id.int().cpu().tolist()
     classes = result.boxes.cls.int().cpu().tolist()
 
-    for box, track_id, cls_id in zip(boxes, track_ids, classes):
-        x, y, w, h = box
+    for box, box_xyxy, track_id, cls_id in zip(boxes, boxes_xyxy, track_ids, classes):
+        center_x, center_y, w, h = box
+        x1, y1, x2, y2 = box_xyxy
 
         track = track_history[track_id]
 
@@ -123,12 +125,12 @@ def run_od_track_on_image(
 
         frame_cv2 = cv2.rectangle(
                 frame_cv2,
-                (int(x), int(y)), (int(x+w), int(y+h)),
+                (int(x1), int(y1)), (int(x2), int(y2)),
                 bbox_color, bbox_thickness)
 
         frame_cv2 = cv2.putText(
                 frame_cv2, "%s #%d" % (result.names[cls_id], track_id),
-                (int(x), int(y) - 10),  # specify the bottom left corner
+                (int(x1), int(y1) - 10),  # specify the bottom left corner
                 cv2.FONT_HERSHEY_PLAIN, font_size,
                 bbox_color, text_thickness)
     return frame_cv2, results
@@ -206,7 +208,7 @@ if __name__ == "__main__":
 
             # see here for inference arguments
             # https://docs.ultralytics.com/modes/predict/#inference-arguments
-            color_image, _ = run_od_on_image(color_image, model, classes=[0, 32])
+            #color_image, _ = run_od_on_image(color_image, model, classes=[0, 32])
             color_image, _ = run_od_track_on_image(color_image, model, track_history, classes=[0, 32])
 
             image = color_image
