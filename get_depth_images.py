@@ -130,8 +130,10 @@ if __name__ == "__main__":
 
             if args.save_data_only:
                 image = color_image
-                depth_data_int_array = depth_image.astype("uint8")
-                depth_data_dict[frame_count] = depth_data_int_array
+                if args.depth_data_file is not None:
+                    # the following is still huge
+                    depth_data_int_array = depth_image.astype("uint8")
+                    depth_data_dict[frame_count] = depth_data_int_array
             else:
                 # for visualization
 
