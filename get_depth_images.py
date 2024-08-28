@@ -86,7 +86,7 @@ if __name__ == "__main__":
             fourcc = cv2.VideoWriter_fourcc(*"XVID")
 
             # the visualization video size
-            width_height = (1920, 540)
+            width_height = (1280, 360)
             if args.save_data_only:
                 # only saving the RGB video
                 width_height = (1280, 720)
@@ -195,7 +195,7 @@ if __name__ == "__main__":
             fps = frame_count / (current_time - start_time)
             image = cv2.putText(
                 image, "FPS: %d" % int(fps),
-                (10, 500), cv2.FONT_HERSHEY_SIMPLEX,
+                (10, 330), cv2.FONT_HERSHEY_SIMPLEX,
                 fontScale=1, color=(0, 0, 255), thickness=2)
 
             # Show the image
