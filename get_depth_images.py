@@ -123,8 +123,7 @@ if __name__ == "__main__":
             # Convert images to numpy arrays
             depth_image = np.asanyarray(depth_frame.get_data())
             color_image = np.asanyarray(color_frame.get_data())
-            # (480, 640, 3), (480, 640)
-            # depth_image are in meters
+            # (720, 1280, 3), (720, 1280)
             #print(color_image.shape, depth_image.shape)
             #print(depth_image[240, 320]) # 单位：毫米
 
