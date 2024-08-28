@@ -25,11 +25,13 @@ from collections import defaultdict
 #   1. https://docs.ultralytics.com/models/yolov9/
 #   2. https://medium.com/@Mert.A/how-to-use-yolov9-for-object-detection-93598ad88d7d
 from ultralytics import YOLO
+from ultralytics import YOLOWorld
 
 parser = argparse.ArgumentParser()
 
 parser.add_argument("--save_to_avi", default=None, help="save the visualization video to a avi file")
 parser.add_argument("--use_large_model", action="store_true")
+parser.add_argument("--use_open_model", action="store_true")
 
 
 def show_point_depth(point, depth_image, color_image):
@@ -144,12 +146,17 @@ if __name__ == "__main__":
 
     # load the model first
     # initialize the object detection model
-    # this will auto download the YOLOv9 checkpoint
-    # see here for all the available models: https://docs.ultralytics.com/models/yolov9/#performance-on-ms-coco-dataset
-    if args.use_large_model:
-        model = YOLO("yolov9e.pt")
+
+    if args.use_open_model:
+
     else:
-        model = YOLO("yolov9t.pt")
+        # tranditional COCO detection model
+        # this will auto download the YOLOv9 checkpoint
+        # see here for all the available models: https://docs.ultralytics.com/models/yolov9/#performance-on-ms-coco-dataset
+        if args.use_large_model:
+            model = YOLO("yolov9e.pt") # latency on RTX 2060: 36 ms
+        else:
+            model = YOLO("yolov9t.pt") # latency on RTX 2060: 11 ms
 
     # Configure RealSense pipeline for depth and RGB.
     pipeline = rs.pipeline()
