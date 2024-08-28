@@ -151,7 +151,7 @@ if __name__ == "__main__":
 
             # see here for inference arguments
             # https://docs.ultralytics.com/modes/predict/#inference-arguments
-            color_image, _ = run_od_on_image(color_image, model)
+            color_image, _ = run_od_on_image(color_image, model, classes=[0, 32])
 
             image = color_image
 
