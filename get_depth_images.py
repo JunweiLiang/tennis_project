@@ -132,7 +132,7 @@ if __name__ == "__main__":
             if args.save_data_only:
                 image = color_image
                 depth_data_dict[frame_count] = depth_image
-
+                image = image_resize(image, width=640, height=None)
             else:
                 # for visualization
 
@@ -183,7 +183,7 @@ if __name__ == "__main__":
             image = cv2.putText(
                 image, "#%d: %s" % (frame_count, date_time),
                 (10, 30), cv2.FONT_HERSHEY_SIMPLEX,
-                fontScale=1, color=(0, 0, 255), thickness=1)
+                fontScale=1, color=(0, 0, 255), thickness=2)
 
             if args.save_to_avi is not None:
 
