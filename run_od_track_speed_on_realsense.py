@@ -116,8 +116,7 @@ def run_od_track_on_image(
 
     for box, track_id, cls_id in zip(boxes, track_ids, classes):
         x, y, w, h = box
-        print(x, y, w, h)
-        sys.exit()
+
         track = track_history[track_id]
 
         bbox_color = (255, 0, 0) # BGR
@@ -207,7 +206,7 @@ if __name__ == "__main__":
 
             # see here for inference arguments
             # https://docs.ultralytics.com/modes/predict/#inference-arguments
-            #color_image, _ = run_od_on_image(color_image, model, classes=[0, 32])
+            color_image, _ = run_od_on_image(color_image, model, classes=[0, 32])
             color_image, _ = run_od_track_on_image(color_image, model, track_history, classes=[0, 32])
 
             image = color_image
