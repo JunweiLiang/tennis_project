@@ -94,6 +94,7 @@ if __name__ == "__main__":
             # Wait for a coherent pair of frames: depth and color
             frames = pipeline.wait_for_frames()
             frames.keep()  # realsense's problem
+            # https://support.intelrealsense.com/hc/en-us/community/posts/4410630729619-RuntimeError-Error-occured-during-execution-of-the-processing-block-See-the-log-for-more-info
 
             # 1. we need to align the frames, so on the x,y of RGB, we get the correct depth
             aligned_frames = aligner.process(frames)
