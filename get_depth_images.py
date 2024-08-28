@@ -55,8 +55,8 @@ if __name__ == "__main__":
         # Configure RealSense pipeline for depth and RGB.
         pipeline = rs.pipeline()
         config = rs.config()
-        config.enable_stream(rs.stream.depth, 640, 480, rs.format.z16, 30)
-        config.enable_stream(rs.stream.color, 640, 480, rs.format.bgr8, 30)
+        config.enable_stream(rs.stream.depth, 1280, 720, rs.format.z16, 30)
+        config.enable_stream(rs.stream.color, 1280, 720, rs.format.bgr8, 30)
         profile = pipeline.start(config)
 
         depth_sensor = profile.get_device().first_depth_sensor()
@@ -84,10 +84,10 @@ if __name__ == "__main__":
             # cannot save to mp4 file, due to liscensing problem, need to compile opencv from source
             print("saving to avi video %s..." % args.save_to_avi)
             fourcc = cv2.VideoWriter_fourcc(*"XVID")
-            width_height = (1280, 480)
+            width_height = (1920, 1080)
             if args.save_data_only:
                 # only saving the RGB video
-                width_height = (640, 480)
+                width_height = (1280, 720)
             out = cv2.VideoWriter(args.save_to_avi, fourcc, 30.0, width_height)
 
         while True:
@@ -133,8 +133,8 @@ if __name__ == "__main__":
                 # for visualization
 
                 # showing two points' depth
-                point1 = (200, 200)  # (y, x)
-                point2 = (240, 320)
+                point1 = (400, 400)  # (y, x)
+                point2 = (480, 640)
 
                 color_image, depth1 = show_point_depth(point1, depth_image, color_image)
                 color_image, depth2 = show_point_depth(point2, depth_image, color_image)
@@ -168,7 +168,7 @@ if __name__ == "__main__":
                 # Stack both images horizontally
                 image = np.hstack((color_image, depth_colormap))
 
-                image = image_resize(image, width=1280, height=None)
+                image = image_resize(image, width=1920, height=None)
 
                 print_once("image shape: %s" % list(image.shape[:2]))
 
