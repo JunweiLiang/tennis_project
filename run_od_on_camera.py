@@ -58,21 +58,20 @@ def run_od_on_image(
 
     # see here for the API documentation of results
     # https://docs.ultralytics.com/modes/predict/#working-with-results
-    for result in results:
-        # each class?
-        for box in result.boxes:
-            bbox = [int(x) for x in box.xyxy[0]]
-            bbox_color = (0, 255, 0) # BGR
-            frame_cv2 = cv2.rectangle(
-                    frame_cv2,
-                    tuple(bbox[0:2]), tuple(bbox[2:4]),
-                    bbox_color, bbox_thickness)
+    result = results[0] # we run it on single image
+    for box in result.boxes:
+        bbox = [int(x) for x in box.xyxy[0]]
+        bbox_color = (0, 255, 0) # BGR
+        frame_cv2 = cv2.rectangle(
+                frame_cv2,
+                tuple(bbox[0:2]), tuple(bbox[2:4]),
+                bbox_color, bbox_thickness)
 
-            frame_cv2 = cv2.putText(
-                    frame_cv2, "%s" % result.names[int(box.cls[0])],
-                    (bbox[0], bbox[1] - 10),  # specify the bottom left corner
-                    cv2.FONT_HERSHEY_PLAIN, font_size,
-                    bbox_color, text_thickness)
+        frame_cv2 = cv2.putText(
+                frame_cv2, "%s" % result.names[int(box.cls[0])],
+                (bbox[0], bbox[1] - 10),  # specify the bottom left corner
+                cv2.FONT_HERSHEY_PLAIN, font_size,
+                bbox_color, text_thickness)
     return frame_cv2, results
 
 

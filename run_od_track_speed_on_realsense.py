@@ -116,6 +116,8 @@ def run_od_track_on_image(
 
     for box, track_id, cls_id in zip(boxes, track_ids, classes):
         x, y, w, h = box
+        print(x, y, w, h)
+        sys.exit()
         track = track_history[track_id]
 
         bbox_color = (255, 0, 0) # BGR
