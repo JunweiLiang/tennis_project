@@ -17,6 +17,7 @@ import pyrealsense2 as rs
 
 from utils import image_resize
 from utils import print_once
+from collections import defaultdict
 
 # This is a good open-source wrapper
 # pip install ultralytics
@@ -83,6 +84,56 @@ def run_od_on_image(
                     bbox_color, text_thickness)
     return frame_cv2, results
 
+def run_od_track_on_image(
+        frame_cv2, od_model, track_history,
+        classes=[], conf=0.5,
+        bbox_thickness=4, text_thickness=2, font_size=2):
+    """
+        run object detection and tracking on a new frame, and visualize
+    """
+
+    # see here for inference arguments
+    # https://docs.ultralytics.com/modes/track/#tracking
+    results = od_model.track(
+        frame_cv2,
+        #tracker="bytetrack.yaml",
+        tracker="botsort.yaml",
+        classes=None if len(classes)==0 else classes,  # you can specify the classes you want
+        # see here for coco class indexes [0-79], 0 is person: https://gist.github.com/AruniRC/7b3dadd004da04c80198557db5da4bda
+        #classes=[0, 32], # detect person and sports ball only
+        conf=conf,
+        iou=0.5,
+        persist=True
+        )
+
+    # see here for the API documentation of results
+    # https://docs.ultralytics.com/modes/predict/#working-with-results
+    for result in results:
+        # each class
+
+        # Get the boxes and track IDs for ploting the lines
+        boxes = result.boxes.xywh.cpu()
+        track_ids = result.boxes.id.int().cpu().tolist()
+
+        for box, track_id in zip(boxes, track_ids):
+            x, y, w, h = box
+            track = track_history[track_id]
+
+            bbox_color = (255, 0, 0) # BGR
+
+            frame_cv2 = cv2.rectangle(
+                    frame_cv2,
+                    (x, y), (x+w, y+h),
+                    bbox_color, bbox_thickness)
+
+            frame_cv2 = cv2.putText(
+                    frame_cv2, "%s #%d" % (result.names[int(box.cls[0])], track_id),
+                    (x, y - 10),  # specify the bottom left corner
+                    cv2.FONT_HERSHEY_PLAIN, font_size,
+                    bbox_color, text_thickness)
+    return frame_cv2, results
+
+
 if __name__ == "__main__":
     args = parser.parse_args()
 
@@ -125,6 +176,10 @@ if __name__ == "__main__":
             width_height = (1280, 720)
             out = cv2.VideoWriter(args.save_to_avi, fourcc, 30.0, width_height)
 
+
+        # Store the track history
+        track_history = defaultdict(lambda: [])
+
         while True:
             # Wait for a coherent pair of frames: depth and color
             frames = pipeline.wait_for_frames()
@@ -151,7 +206,8 @@ if __name__ == "__main__":
 
             # see here for inference arguments
             # https://docs.ultralytics.com/modes/predict/#inference-arguments
-            color_image, _ = run_od_on_image(color_image, model, classes=[0, 32])
+            #color_image, _ = run_od_on_image(color_image, model, classes=[0, 32])
+            color_image, _ = run_od_track_on_image(color_image, model, track_history, classes=[0, 32])
 
             image = color_image
 
