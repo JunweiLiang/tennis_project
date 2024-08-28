@@ -147,7 +147,7 @@ if __name__ == "__main__":
     # this will auto download the YOLOv9 checkpoint
     # see here for all the available models: https://docs.ultralytics.com/models/yolov9/#performance-on-ms-coco-dataset
     if args.use_large_model:
-        model = YOLO("yolov9c.pt")
+        model = YOLO("yolov9e.pt")
     else:
         model = YOLO("yolov9t.pt")
 
