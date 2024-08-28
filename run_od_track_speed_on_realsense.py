@@ -103,7 +103,7 @@ def run_od_track_on_image(
     # https://docs.ultralytics.com/modes/track/#tracking
     results = od_model.track(
         frame_cv2,
-        tracker="bytetrack.yaml",
+        tracker="bytetrack.yaml", # https://github.com/ultralytics/ultralytics/blob/main/ultralytics/cfg/trackers/bytetrack.yaml
         #tracker="botsort.yaml",
         classes=None if len(classes)==0 else classes,  # you can specify the classes you want
         # see here for coco class indexes [0-79], 0 is person: https://gist.github.com/AruniRC/7b3dadd004da04c80198557db5da4bda
@@ -236,7 +236,7 @@ if __name__ == "__main__":
 
             # see here for inference arguments
             # https://docs.ultralytics.com/modes/predict/#inference-arguments
-            #color_image, _ = run_od_on_image(color_image, model, classes=[0, 32], conf=args.det_conf)
+            color_image, _ = run_od_on_image(color_image, model, classes=[0, 32], conf=args.det_conf)
             color_image, _ = run_od_track_on_image(color_image, model, track_history, classes=detection_classes, conf=args.det_conf)
 
             image = color_image
