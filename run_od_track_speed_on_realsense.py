@@ -155,10 +155,9 @@ if __name__ == "__main__":
         # this will auto download the YOLOv9 checkpoint
         # see here for all the available models: https://docs.ultralytics.com/models/yolov9/#performance-on-ms-coco-dataset
         if args.use_large_model:
-            model = YOLO("yolov9e.pt") # latency on RTX 2060: 36 ms
+            model = YOLO("yolov8x.pt") # latency on RTX 2060: 36 ms
         else:
-            #model = YOLO("yolov9t.pt") # latency on RTX 2060: 11 ms
-            model = YOLO("yolov8n_tennis.pt")
+            model = YOLO("yolov9t.pt") # latency on RTX 2060: 11 ms
 
     # Configure RealSense pipeline for depth and RGB.
     pipeline = rs.pipeline()
