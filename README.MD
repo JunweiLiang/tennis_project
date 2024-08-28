@@ -20,3 +20,6 @@ This repo contains clean exercise code for:
     Femoto Bolt 1280x960@30fps
     tennis_project$ python get_depth_images_orbbec.py --save_to_avi orbbec_rgb_only.avi --save_data_only
     ```
+
+### Other potential resources
++ From Roboflow `https://universe.roboflow.com/search?q=class%3Atennis-ball`

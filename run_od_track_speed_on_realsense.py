@@ -28,9 +28,12 @@ from ultralytics import YOLO
 from ultralytics import YOLOWorld
 
 parser = argparse.ArgumentParser()
-
+parser.add_argument("--det_conf", default=0.5, type=float)
 parser.add_argument("--save_to_avi", default=None, help="save the visualization video to a avi file")
-parser.add_argument("--use_large_model", action="store_true")
+# see here for all the available models: https://docs.ultralytics.com/models/yolov9/#performance-on-ms-coco-dataset
+# larger "yolov8x.pt" # latency on RTX 2060: 33.3 ms
+# small "yolov9t.pt" # latency on RTX 2060: 11 ms
+parser.add_argument("--yolo_model_name", default="yolov10x.pt")
 parser.add_argument("--use_open_model", action="store_true")
 
 
@@ -124,8 +127,6 @@ def run_od_track_on_image(
             center_x, center_y, w, h = box
             x1, y1, x2, y2 = box_xyxy
 
-            track = track_history[track_id]
-
             bbox_color = (255, 0, 0) # BGR
 
             frame_cv2 = cv2.rectangle(
@@ -138,6 +139,16 @@ def run_od_track_on_image(
                     (int(x1), int(y1) - 10),  # specify the bottom left corner
                     cv2.FONT_HERSHEY_PLAIN, font_size,
                     bbox_color, text_thickness)
+
+            # plot the trace
+            track = track_history[track_id]
+            track.append((float(center_x), float(center_y)))
+            if len(track) > 30:
+                track.pop(0)
+
+            points = np.hstack(track).astype(np.int32).reshape((-1, 1, 2))
+            cv2.polylines(frame_cv2, [points], isClosed=False, color=(230, 230, 230), thickness=8)
+
     return frame_cv2, results
 
 
@@ -147,17 +158,20 @@ if __name__ == "__main__":
     # load the model first
     # initialize the object detection model
 
+    detection_classes = [0, 32] # person, sports ball on COCO
     if args.use_open_model:
+        detection_classes = ["person", "tennis ball"] # not good
+        # https://github.com/ultralytics/assets/releases/download/v8.2.0/yolov8x-worldv2.pt
         model = YOLOWorld("yolov8x-worldv2.pt")
-        model.set_classes(["person", "tennis ball"])
+        model.set_classes(detection_classes)
     else:
         # tranditional COCO detection model
         # this will auto download the YOLOv9 checkpoint
         # see here for all the available models: https://docs.ultralytics.com/models/yolov9/#performance-on-ms-coco-dataset
-        if args.use_large_model:
-            model = YOLO("yolov8x.pt") # latency on RTX 2060: 36 ms
-        else:
-            model = YOLO("yolov9t.pt") # latency on RTX 2060: 11 ms
+        # larger "yolov8x.pt" # latency on RTX 2060: 33.3 ms
+        # small "yolov9t.pt" # latency on RTX 2060: 11 ms
+        model = YOLO(args.yolo_model_name)
+
 
     # Configure RealSense pipeline for depth and RGB.
     pipeline = rs.pipeline()
@@ -222,8 +236,8 @@ if __name__ == "__main__":
 
             # see here for inference arguments
             # https://docs.ultralytics.com/modes/predict/#inference-arguments
-            #color_image, _ = run_od_on_image(color_image, model, classes=[0, 32])
-            color_image, _ = run_od_track_on_image(color_image, model, track_history, classes=[0, 32])
+            #color_image, _ = run_od_on_image(color_image, model, classes=[0, 32], conf=args.det_conf)
+            color_image, _ = run_od_track_on_image(color_image, model, track_history, classes=detection_classes, conf=args.det_conf)
 
             image = color_image
 
