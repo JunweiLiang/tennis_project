@@ -191,7 +191,7 @@ if __name__ == "__main__":
             fps = frame_count / (current_time - start_time)
             image = cv2.putText(
                 image, "FPS: %d" % int(fps),
-                (10, 700), cv2.FONT_HERSHEY_SIMPLEX,
+                (10, 500), cv2.FONT_HERSHEY_SIMPLEX,
                 fontScale=1, color=(0, 0, 255), thickness=2)
 
             # Show the image
