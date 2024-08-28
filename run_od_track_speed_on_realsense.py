@@ -29,6 +29,7 @@ from ultralytics import YOLO
 parser = argparse.ArgumentParser()
 
 parser.add_argument("--save_to_avi", default=None, help="save the visualization video to a avi file")
+parser.add_argument("--use_large_model", action="store_true")
 
 
 def show_point_depth(point, depth_image, color_image):
@@ -111,28 +112,29 @@ def run_od_track_on_image(
 
     # Get the boxes and track IDs for ploting the lines
     boxes = result.boxes.xywh.cpu()
-    boxes_xyxy = result.boxes.xyxy.cpu()
-    track_ids = result.boxes.id.int().cpu().tolist()
-    classes = result.boxes.cls.int().cpu().tolist()
+    if len(boxes) > 0:
+        boxes_xyxy = result.boxes.xyxy.cpu()
+        track_ids = result.boxes.id.int().cpu().tolist()
+        classes = result.boxes.cls.int().cpu().tolist()
 
-    for box, box_xyxy, track_id, cls_id in zip(boxes, boxes_xyxy, track_ids, classes):
-        center_x, center_y, w, h = box
-        x1, y1, x2, y2 = box_xyxy
+        for box, box_xyxy, track_id, cls_id in zip(boxes, boxes_xyxy, track_ids, classes):
+            center_x, center_y, w, h = box
+            x1, y1, x2, y2 = box_xyxy
 
-        track = track_history[track_id]
+            track = track_history[track_id]
 
-        bbox_color = (255, 0, 0) # BGR
+            bbox_color = (255, 0, 0) # BGR
 
-        frame_cv2 = cv2.rectangle(
-                frame_cv2,
-                (int(x1), int(y1)), (int(x2), int(y2)),
-                bbox_color, bbox_thickness)
+            frame_cv2 = cv2.rectangle(
+                    frame_cv2,
+                    (int(x1), int(y1)), (int(x2), int(y2)),
+                    bbox_color, bbox_thickness)
 
-        frame_cv2 = cv2.putText(
-                frame_cv2, "%s #%d" % (result.names[cls_id], track_id),
-                (int(x1), int(y1) - 10),  # specify the bottom left corner
-                cv2.FONT_HERSHEY_PLAIN, font_size,
-                bbox_color, text_thickness)
+            frame_cv2 = cv2.putText(
+                    frame_cv2, "%s #%d" % (result.names[cls_id], track_id),
+                    (int(x1), int(y1) - 10),  # specify the bottom left corner
+                    cv2.FONT_HERSHEY_PLAIN, font_size,
+                    bbox_color, text_thickness)
     return frame_cv2, results
 
 
@@ -143,7 +145,10 @@ if __name__ == "__main__":
     # initialize the object detection model
     # this will auto download the YOLOv9 checkpoint
     # see here for all the available models: https://docs.ultralytics.com/models/yolov9/#performance-on-ms-coco-dataset
-    model = YOLO("yolov9t.pt")
+    if args.use_large_model:
+        model = YOLO("yolov9c.pt")
+    else:
+        model = YOLO("yolov9t.pt")
 
     # Configure RealSense pipeline for depth and RGB.
     pipeline = rs.pipeline()
