@@ -84,7 +84,9 @@ if __name__ == "__main__":
             # cannot save to mp4 file, due to liscensing problem, need to compile opencv from source
             print("saving to avi video %s..." % args.save_to_avi)
             fourcc = cv2.VideoWriter_fourcc(*"XVID")
-            width_height = (1920, 1080)
+
+            # the visualization video size
+            width_height = (1920, 540)
             if args.save_data_only:
                 # only saving the RGB video
                 width_height = (1280, 720)
@@ -128,7 +130,7 @@ if __name__ == "__main__":
 
             if args.save_data_only:
                 image = color_image
-                depth_data_int_array = depth_image.astype(np.int16)
+                depth_data_int_array = depth_image.astype("uint8")
                 depth_data_dict[frame_count] = depth_data_int_array
             else:
                 # for visualization
