@@ -148,7 +148,8 @@ if __name__ == "__main__":
     # initialize the object detection model
 
     if args.use_open_model:
-
+        model = YOLOWorld("yolov8x-worldv2.pt")
+        model.set_classes(["person", "tennis ball"])
     else:
         # tranditional COCO detection model
         # this will auto download the YOLOv9 checkpoint
@@ -156,7 +157,8 @@ if __name__ == "__main__":
         if args.use_large_model:
             model = YOLO("yolov9e.pt") # latency on RTX 2060: 36 ms
         else:
-            model = YOLO("yolov9t.pt") # latency on RTX 2060: 11 ms
+            #model = YOLO("yolov9t.pt") # latency on RTX 2060: 11 ms
+            model = YOLO("yolov8n_tennis.pt")
 
     # Configure RealSense pipeline for depth and RGB.
     pipeline = rs.pipeline()
