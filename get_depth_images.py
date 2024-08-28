@@ -128,7 +128,8 @@ if __name__ == "__main__":
 
             if args.save_data_only:
                 image = color_image
-                depth_data_dict[frame_count] = depth_image
+                depth_data_int_array = depth_image.astype(np.int16)
+                depth_data_dict[frame_count] = depth_data_int_array
             else:
                 # for visualization
 
@@ -190,7 +191,7 @@ if __name__ == "__main__":
             fps = frame_count / (current_time - start_time)
             image = cv2.putText(
                 image, "FPS: %d" % int(fps),
-                (10, 450), cv2.FONT_HERSHEY_SIMPLEX,
+                (10, 700), cv2.FONT_HERSHEY_SIMPLEX,
                 fontScale=1, color=(0, 0, 255), thickness=2)
 
             # Show the image
