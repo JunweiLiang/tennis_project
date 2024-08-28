@@ -112,7 +112,8 @@ def run_od_track_on_image(
 
     # Get the boxes and track IDs for ploting the lines
     boxes = result.boxes.xywh.cpu()
-    if len(boxes) > 0:
+    # only visualize when there are tracks
+    if len(result.boxes.id) > 0:
         boxes_xyxy = result.boxes.xyxy.cpu()
         track_ids = result.boxes.id.int().cpu().tolist()
         classes = result.boxes.cls.int().cpu().tolist()
