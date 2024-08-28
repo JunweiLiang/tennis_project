@@ -36,6 +36,7 @@ parser.add_argument("--save_to_avi", default=None, help="save the visualization 
 # yolov10l 20 ms
 # small "yolov9t.pt" # latency on RTX 2060: 11 ms
 parser.add_argument("--yolo_model_name", default="yolov10x.pt")
+parser.add_argument("--tracker_yaml", default="bytetrack.yaml")
 parser.add_argument("--use_open_model", action="store_true")
 
 
@@ -94,6 +95,7 @@ def run_od_on_image(
 def run_od_track_on_image(
         frame_cv2, od_model, track_history,
         classes=[], conf=0.5,
+        tracker_yaml="bytetrack.yaml", # https://github.com/ultralytics/ultralytics/blob/main/ultralytics/cfg/trackers/bytetrack.yaml
         bbox_thickness=4, text_thickness=2, font_size=2):
     """
         run object detection and tracking on a new frame, and visualize
@@ -103,7 +105,7 @@ def run_od_track_on_image(
     # https://docs.ultralytics.com/modes/track/#tracking
     results = od_model.track(
         frame_cv2,
-        tracker="bytetrack.yaml", # https://github.com/ultralytics/ultralytics/blob/main/ultralytics/cfg/trackers/bytetrack.yaml
+        tracker=tracker_yaml,
         #tracker="botsort.yaml",
         classes=None if len(classes)==0 else classes,  # you can specify the classes you want
         # see here for coco class indexes [0-79], 0 is person: https://gist.github.com/AruniRC/7b3dadd004da04c80198557db5da4bda
@@ -236,8 +238,11 @@ if __name__ == "__main__":
 
             # see here for inference arguments
             # https://docs.ultralytics.com/modes/predict/#inference-arguments
-            color_image, _ = run_od_on_image(color_image, model, classes=[0, 32], conf=args.det_conf)
-            color_image, _ = run_od_track_on_image(color_image, model, track_history, classes=detection_classes, conf=args.det_conf)
+            #color_image, _ = run_od_on_image(color_image, model, classes=[0, 32], conf=args.det_conf)
+            color_image, _ = run_od_track_on_image(
+                color_image, model, track_history,
+                classes=detection_classes, conf=args.det_conf,
+                tracker_yaml=args.tracker_yaml)
 
             image = color_image
 
