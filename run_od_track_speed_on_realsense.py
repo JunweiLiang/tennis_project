@@ -32,6 +32,8 @@ parser.add_argument("--det_conf", default=0.5, type=float)
 parser.add_argument("--save_to_avi", default=None, help="save the visualization video to a avi file")
 # see here for all the available models: https://docs.ultralytics.com/models/yolov9/#performance-on-ms-coco-dataset
 # larger "yolov8x.pt" # latency on RTX 2060: 33.3 ms
+# yolov10x 27 ms
+# yolov10l 20 ms
 # small "yolov9t.pt" # latency on RTX 2060: 11 ms
 parser.add_argument("--yolo_model_name", default="yolov10x.pt")
 parser.add_argument("--use_open_model", action="store_true")
@@ -101,8 +103,8 @@ def run_od_track_on_image(
     # https://docs.ultralytics.com/modes/track/#tracking
     results = od_model.track(
         frame_cv2,
-        #tracker="bytetrack.yaml",
-        tracker="botsort.yaml",
+        tracker="bytetrack.yaml",
+        #tracker="botsort.yaml",
         classes=None if len(classes)==0 else classes,  # you can specify the classes you want
         # see here for coco class indexes [0-79], 0 is person: https://gist.github.com/AruniRC/7b3dadd004da04c80198557db5da4bda
         #classes=[0, 32], # detect person and sports ball only
@@ -160,7 +162,7 @@ if __name__ == "__main__":
 
     detection_classes = [0, 32] # person, sports ball on COCO
     if args.use_open_model:
-        detection_classes = ["person", "tennis ball"] # not good
+        detection_classes = ["person", "tennis ball"] # does not work yet
         # https://github.com/ultralytics/assets/releases/download/v8.2.0/yolov8x-worldv2.pt
         model = YOLOWorld("yolov8x-worldv2.pt")
         model.set_classes(detection_classes)
@@ -168,8 +170,6 @@ if __name__ == "__main__":
         # tranditional COCO detection model
         # this will auto download the YOLOv9 checkpoint
         # see here for all the available models: https://docs.ultralytics.com/models/yolov9/#performance-on-ms-coco-dataset
-        # larger "yolov8x.pt" # latency on RTX 2060: 33.3 ms
-        # small "yolov9t.pt" # latency on RTX 2060: 11 ms
         model = YOLO(args.yolo_model_name)
 
 
