@@ -13,6 +13,6 @@ new_track_thresh: 0.6 # threshold for init new track if the detection does not m
 # in frames, so 30 fps, track_buffer==30, it will keep track for 1 second
 track_buffer: 120 # buffer to calculate the time when to remove tracks original 30
 # feature matching threshold
-match_thresh: 0.95 # threshold for matching tracks # original 0.8
+match_thresh: 0.8 # threshold for matching tracks # original 0.8
 
 fuse_score: False # Whether to fuse confidence scores with the iou distances before matching original True
