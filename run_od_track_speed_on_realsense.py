@@ -178,6 +178,10 @@ if __name__ == "__main__":
         # see here for all the available models: https://docs.ultralytics.com/models/yolov9/#performance-on-ms-coco-dataset
         model = YOLO(args.yolo_model_name)
 
+        if args.check_detection_result:
+            # need to be a different model instance
+            model_check = YOLO(args.yolo_model_name)
+
 
     # Configure RealSense pipeline for depth and RGB.
     pipeline = rs.pipeline()
@@ -244,7 +248,7 @@ if __name__ == "__main__":
             # https://docs.ultralytics.com/modes/predict/#inference-arguments
             if args.check_detection_result:
                 color_image, _ = run_od_on_image(
-                    color_image, model, classes=detection_classes, conf=args.det_conf,
+                    color_image, model_check, classes=detection_classes, conf=args.det_conf,
                     bbox_thickness=4) # larger box to be overwritten by track results
 
             color_image, results = run_od_track_on_image(
