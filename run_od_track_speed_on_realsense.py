@@ -38,6 +38,8 @@ parser.add_argument("--save_to_avi", default=None, help="save the visualization 
 parser.add_argument("--yolo_model_name", default="yolov10x.pt")
 parser.add_argument("--tracker_yaml", default="bytetrack.yaml")
 parser.add_argument("--use_open_model", action="store_true")
+parser.add_argument("--check_detection_result", action="store_true",
+    help="if true, will also visualize detection results")
 
 
 def show_point_depth(point, depth_image, color_image):
@@ -238,7 +240,10 @@ if __name__ == "__main__":
 
             # see here for inference arguments
             # https://docs.ultralytics.com/modes/predict/#inference-arguments
-            #color_image, _ = run_od_on_image(color_image, model, classes=[0, 32], conf=args.det_conf)
+            if args.check_detection_results:
+                color_image, _ = run_od_on_image(
+                    color_image, model, classes=detection_classes, conf=args.det_conf,
+                    bbox_thickness=4) # larger box to be overwritten by track results
             color_image, _ = run_od_track_on_image(
                 color_image, model, track_history,
                 classes=detection_classes, conf=args.det_conf,
