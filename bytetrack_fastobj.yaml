@@ -11,7 +11,7 @@ track_low_thresh: 0.05 # threshold for the second association
 new_track_thresh: 0.6 # threshold for init new track if the detection does not match any tracks # original 0.6
 
 # in frames, so 30 fps, track_buffer==30, it will keep track for 1 second
-track_buffer: 120 # buffer to calculate the time when to remove tracks original 30
+track_buffer: 60 # buffer to calculate the time when to remove tracks original 30
 # feature matching threshold
 match_thresh: 0.9 # threshold for matching tracks # original 0.8
 
