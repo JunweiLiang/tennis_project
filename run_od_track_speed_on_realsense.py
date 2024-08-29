@@ -121,6 +121,8 @@ def run_od_track_on_image(
     # https://docs.ultralytics.com/modes/predict/#working-with-results
     result = results[0]
 
+    time_now = time.time()
+
     # Get the boxes and track IDs for ploting the lines
     boxes = result.boxes.xywh.cpu()
     # only visualize when there are tracks
@@ -148,11 +150,11 @@ def run_od_track_on_image(
 
             # plot the trace
             track = track_history[track_id]
-            track.append((float(center_x), float(center_y)))
+            track.append((float(center_x), float(center_y), cls_id, time_now))
             if len(track) > 30:
                 track.pop(0)
 
-            points = np.hstack(track).astype(np.int32).reshape((-1, 1, 2))
+            points = np.hstack([ (x[0], x[1]) for x in track]).astype(np.int32).reshape((-1, 1, 2))
             cv2.polylines(frame_cv2, [points], isClosed=False, color=(230, 230, 230), thickness=8)
 
     return frame_cv2, results
@@ -244,7 +246,8 @@ if __name__ == "__main__":
                 color_image, _ = run_od_on_image(
                     color_image, model, classes=detection_classes, conf=args.det_conf,
                     bbox_thickness=4) # larger box to be overwritten by track results
-            color_image, _ = run_od_track_on_image(
+
+            color_image, results = run_od_track_on_image(
                 color_image, model, track_history,
                 classes=detection_classes, conf=args.det_conf,
                 tracker_yaml=args.tracker_yaml)

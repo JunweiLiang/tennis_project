@@ -15,4 +15,4 @@ track_buffer: 90 # buffer to calculate the time when to remove tracks original 3
 # feature matching threshold
 match_thresh: 0.8 # threshold for matching tracks # original 0.8
 
-fuse_score: True # Whether to fuse confidence scores with the iou distances before matching original True
+fuse_score: False # Whether to fuse confidence scores with the iou distances before matching original True
