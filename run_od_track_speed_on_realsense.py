@@ -180,7 +180,7 @@ if __name__ == "__main__":
 
         if args.check_detection_result:
             # need to be a different model instance
-            model_check = YOLO(args.yolo_model_name)
+            model_check = YOLO("yolov10l.pt")
 
 
     # Configure RealSense pipeline for depth and RGB.
