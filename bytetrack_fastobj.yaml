@@ -4,8 +4,8 @@
 # explain: https://github.com/ultralytics/ultralytics/issues/4473#issuecomment-1686326137
 
 tracker_type: bytetrack # tracker type, ['botsort', 'bytetrack']
-track_high_thresh: 0.3 # threshold for the first association # original 0.5
-track_low_thresh: 0.1 # threshold for the second association
+track_high_thresh: 0.1 # threshold for the first association # original 0.5
+track_low_thresh: 0.05 # threshold for the second association
 
 # This is the threshold used for starting a new track. If a detection doesn't match any existing tracks and its score is above this threshold, a new track will be initialized.
 new_track_thresh: 0.6 # threshold for init new track if the detection does not match any tracks # original 0.6

@@ -166,7 +166,7 @@ if __name__ == "__main__":
     # load the model first
     # initialize the object detection model
 
-    detection_classes = [0, 32] # person, sports ball on COCO
+    detection_classes = [32] # person, sports ball on COCO
     if args.use_open_model:
         detection_classes = ["person", "tennis ball"] # does not work yet
         # https://github.com/ultralytics/assets/releases/download/v8.2.0/yolov8x-worldv2.pt
