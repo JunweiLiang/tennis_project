@@ -240,7 +240,7 @@ if __name__ == "__main__":
 
             # see here for inference arguments
             # https://docs.ultralytics.com/modes/predict/#inference-arguments
-            if args.check_detection_results:
+            if args.check_detection_result:
                 color_image, _ = run_od_on_image(
                     color_image, model, classes=detection_classes, conf=args.det_conf,
                     bbox_thickness=4) # larger box to be overwritten by track results
