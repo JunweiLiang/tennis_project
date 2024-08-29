@@ -38,8 +38,6 @@ parser.add_argument("--save_to_avi", default=None, help="save the visualization 
 parser.add_argument("--yolo_model_name", default="yolov10x.pt")
 parser.add_argument("--tracker_yaml", default="bytetrack.yaml")
 parser.add_argument("--use_open_model", action="store_true")
-parser.add_argument("--check_detection_result", action="store_true",
-    help="if true, will also visualize detection results")
 
 
 def show_point_depth(point, depth_image, color_image):
@@ -178,9 +176,6 @@ if __name__ == "__main__":
         # see here for all the available models: https://docs.ultralytics.com/models/yolov9/#performance-on-ms-coco-dataset
         model = YOLO(args.yolo_model_name)
 
-        if args.check_detection_result:
-            # need to be a different model instance
-            model_check = YOLO("yolov10l.pt")
 
 
     # Configure RealSense pipeline for depth and RGB.
@@ -246,10 +241,9 @@ if __name__ == "__main__":
 
             # see here for inference arguments
             # https://docs.ultralytics.com/modes/predict/#inference-arguments
-            if args.check_detection_result:
-                color_image, _ = run_od_on_image(
-                    color_image, model_check, classes=detection_classes, conf=args.det_conf,
-                    bbox_thickness=4) # larger box to be overwritten by track results
+            #color_image, _ = run_od_on_image(
+            #        color_image, model_check, classes=detection_classes, conf=args.det_conf,
+            #        bbox_thickness=4) # larger box to be overwritten by track results
 
             color_image, results = run_od_track_on_image(
                 color_image, model, track_history,
