@@ -298,9 +298,6 @@ if __name__ == "__main__":
                 (10, 30), cv2.FONT_HERSHEY_SIMPLEX,
                 fontScale=1, color=(0, 0, 255), thickness=2)
 
-            if args.save_to_avi is not None:
-                out.write(image)
-
             # show the fps
             current_time = time.time()
 
@@ -309,6 +306,9 @@ if __name__ == "__main__":
                 image, "FPS: %d" % int(fps),
                 (10, 450), cv2.FONT_HERSHEY_SIMPLEX,
                 fontScale=1, color=(0, 0, 255), thickness=2)
+
+            if args.save_to_avi is not None:
+                out.write(image)
 
             # Show the image
             cv2.imshow('RGB and Depth Stream', image)
