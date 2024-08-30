@@ -127,7 +127,6 @@ if __name__ == "__main__":
     print("Now showing the camera stream. press Q to exit.")
     start_time = time.time()
     frame_count = 0
-    depth_data_dict = {}
     try:
         if args.save_to_avi is not None:
 

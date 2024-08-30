@@ -27,6 +27,10 @@ from utils import print_once
 from utils import run_od_on_image
 from utils import run_od_track_on_image
 
+from get_depth_images_orbbec import deproject_pixel_to_point
+from get_depth_images_orbbec import get_orbbec_color_data
+from get_depth_images_orbbec import get_orbbec_depth_data
+
 # This is a good open-source wrapper
 # pip install ultralytics
 # see tutorial here
@@ -50,9 +54,9 @@ parser.add_argument("--det_only", action="store_true")
 parser.add_argument("--use_kmh", action="store_true")
 
 # for each track, get the latest 3D point and the last 3D points
-x_l, x_r, y_l, y_r = 100, 1280 - 100, 50, 720 - 50
+x_l, x_r, y_l, y_r = 100, 1280 - 100, 50, 960 - 50
 
-def est_speed_on_tracks(track_history, depth_data, depth_intrin, track_speed_history):
+def est_speed_on_tracks(track_history, depth_data, camera_param, track_speed_history):
     # this is for realsense
     # for each track, get the latest 3D point and the last 3D points
     global x_l, x_r, y_l, y_r
@@ -69,12 +73,12 @@ def est_speed_on_tracks(track_history, depth_data, depth_intrin, track_speed_his
             current_depth = depth_data[current_y, current_x]
             last_depth =depth_data[last_y, last_x]
 
-            current_point3d = rs.rs2_deproject_pixel_to_point(
-                depth_intrin,
+            current_point3d = deproject_pixel_to_point(
+                camera_param,
                 (current_x, current_y),
                 current_depth)
-            last_point3d = rs.rs2_deproject_pixel_to_point(
-                depth_intrin,
+            last_point3d = deproject_pixel_to_point(
+                camera_param,
                 (last_x, last_y),
                 last_depth)
 
@@ -83,7 +87,7 @@ def est_speed_on_tracks(track_history, depth_data, depth_intrin, track_speed_his
 
             track_speed = track_speed_history[track_id]
             track_speed.append(speed)
-            if len(track_speed) > 3000:
+            if len(track_speed) > 9000:  # the queue is larger than the data we need
                 track_speed.pop(0)
 
 
@@ -93,7 +97,11 @@ if __name__ == "__main__":
     # load the model first
     # initialize the object detection model
 
-    detection_classes = [32] #  0 person, 32 sports ball on COCO
+    if args.det_only:
+        detection_classes = [32] #  0 person, 32 sports ball on COCO
+    else:
+        detection_classes = [0, 32] #  0 person, 32 sports ball on COCO
+
     if args.use_open_model:
         detection_classes = ["person", "tennis ball"] # does not work yet
         # https://github.com/ultralytics/assets/releases/download/v8.2.0/yolov8x-worldv2.pt
@@ -142,23 +150,7 @@ if __name__ == "__main__":
 
         # 坐标系原点设置： https://www.orbbec.com/documentation-mega/coordinate-systems/
         # camera param 获取: https://github.com/orbbec/pyorbbecsdk/blob/main/test/test_pipeline.py#L35
-        """
-        print(camera_param.depth_intrinsic)
-        print(camera_param.rgb_intrinsic)
-        print(camera_param.depth_distortion)
-        print(camera_param.rgb_distortion)
-        print(camera_param.transform)
 
-        print(camera_param.rgb_intrinsic.fx)
-
-        <OBCameraIntrinsic fx=997.648743 fy=996.949890 cx=632.307373 cy=490.477325 width=1280 height=960>
-        <OBCameraIntrinsic fx=997.648743 fy=996.949890 cx=632.307373 cy=490.477325 width=1280 height=960>
-        <OBCameraDistortion k1=0.073824 k2=-0.100994 k3=0.040822 k4=0.000000 k5=0.000000 k6=0.000000 p1=-0.000142 p2=-0.000074>
-        <OBCameraDistortion k1=0.073824 k2=-0.100994 k3=0.040822 k4=0.000000 k5=0.000000 k6=0.000000 p1=-0.000142 p2=-0.000074>
-        <OBD2CTransform rot=[1, 0, 0, 0, 1, 0, 0, 0, 1]
-        transform=[0, 0, 0]
-        997.6487426757812
-        """
 
     except Exception as e:
         print(e)
@@ -168,7 +160,6 @@ if __name__ == "__main__":
     print("Now showing the camera stream. press Q to exit.")
     start_time = time.time()
     frame_count = 0
-    depth_data_dict = {}
     try:
         if args.save_to_avi is not None:
 
@@ -177,7 +168,7 @@ if __name__ == "__main__":
             fourcc = cv2.VideoWriter_fourcc(*"XVID")
 
             # the visualization video size
-            width_height = (1280, 720)
+            width_height = (1280, 960)
             out = cv2.VideoWriter(args.save_to_avi, fourcc, 30.0, width_height)
 
 
@@ -187,10 +178,12 @@ if __name__ == "__main__":
 
         while True:
             # Wait for a coherent pair of frames: depth and color
-            frames = pipeline.wait_for_frames()
+            frames = pipeline.wait_for_frames(100)  # maximum delay in milliseconds
+            if frames is None:
+                continue
 
-            # 1. we need to align the frames, so on the x,y of RGB, we get the correct depth
-            aligned_frames = aligner.process(frames)
+            # unlike realsense, the frames should be aligned by now
+            aligned_frames = frames
 
             depth_frame = aligned_frames.get_depth_frame()
             color_frame = aligned_frames.get_color_frame()
@@ -198,17 +191,17 @@ if __name__ == "__main__":
             if not depth_frame or not color_frame:
                 continue
 
-            # frame_count start from 1
             frame_count += 1
+
             current_time = time.time()
             fps = int(frame_count / (current_time - start_time))
 
-            # Convert images to numpy arrays
-            color_image = np.asanyarray(color_frame.get_data())
+            # Convert images to cv2 numpy arrays
 
-            # mm to meters
-            depth_data = np.asanyarray(depth_frame.get_data()) * depth_scale
-            depth_intrin = depth_frame.profile.as_video_stream_profile().intrinsics  # 获取深度参数（像素坐标系转相机坐标系会用到）
+            color_image = get_orbbec_color_data(color_frame)
+
+            # in meters
+            depth_data = get_orbbec_depth_data(depth_frame)
 
             # see here for inference arguments
             # https://docs.ultralytics.com/modes/predict/#inference-arguments
@@ -240,7 +233,7 @@ if __name__ == "__main__":
 
             # get track_id -> a list of speed, the last one is the latest speed
             est_speed_on_tracks(
-                track_history, depth_data, depth_intrin,
+                track_history, depth_data, camera_param,
                 track_speed_history)
 
             # print out the speed on the image (trackid, current speed, max speed, mean speed)
@@ -262,8 +255,8 @@ if __name__ == "__main__":
                 unit = "km/h"
                 speed_to_print = [(x[0], x[1]*3.6, x[2]*3.6, x[3]*3.6) for x in speed_to_print]
 
-            start_bottom_y = 680
-            end_bottom_y = 680 - len(speed_to_print)*25
+            start_bottom_y = 920
+            end_bottom_y = 920 - len(speed_to_print)*25
             image = cv2.rectangle(image, (0, end_bottom_y-1), (1280, start_bottom_y), (0, 0, 0), -1)
             for i, (track_id, current_s, max_s, mean_s) in enumerate(speed_to_print):
                 if type(track_id) is str:
@@ -289,7 +282,7 @@ if __name__ == "__main__":
 
             image = cv2.putText(
                 image, "FPS: %d" % int(fps),
-                (10, 710), cv2.FONT_HERSHEY_SIMPLEX,
+                (10, 950), cv2.FONT_HERSHEY_SIMPLEX,
                 fontScale=1, color=(0, 0, 255), thickness=2)
 
             if args.save_to_avi is not None:
