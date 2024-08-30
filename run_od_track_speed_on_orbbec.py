@@ -84,6 +84,8 @@ def est_speed_on_tracks(track_history, depth_data, camera_param, track_speed_his
                 (last_x, last_y),
                 last_depth)
 
+            current_depth = current_point3d
+
             dist = np.linalg.norm(np.array(current_point3d) - np.array(last_point3d))
             speed = dist / (current_timestamp - last_timestamp) # meters / second
 
@@ -268,7 +270,7 @@ if __name__ == "__main__":
                 else:
                     track_name = "%s #%d" % (result.names[track_history[track_id][0][2]], track_id)
                 image = cv2.putText(
-                    image, "%s: speed in last 1s %.1f, max %.1f in last 3s, avg. %.1f %s in last 30s, d: %.1f" % (
+                    image, "%s: speed in last 1s %.1f, max %.1f in last 3s, avg. %.1f %s in last 30s, d: %s" % (
                         track_name, current_s, max_s, mean_s, unit, depth),
                     (10, start_bottom_y), cv2.FONT_HERSHEY_SIMPLEX,
                     fontScale=0.8, color=(0, 255, 0), thickness=2)
