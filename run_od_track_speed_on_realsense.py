@@ -154,6 +154,8 @@ if __name__ == "__main__":
 
             # frame_count start from 1
             frame_count += 1
+            current_time = time.time()
+            fps = int(frame_count / (current_time - start_time))
 
             # Convert images to numpy arrays
             color_image = np.asanyarray(color_frame.get_data())
@@ -197,7 +199,8 @@ if __name__ == "__main__":
 
             # print out the speed on the image (trackid, current speed, max speed, mean speed)
             speed_to_print = [
-                    (track_id, np.mean(speeds[-30:-1]), np.percentile(speeds, 95), np.mean(speeds))
+                    #(track_id, np.mean(speeds[-30:-1]), np.percentile(speeds, 95), np.mean(speeds))
+                    (track_id, np.mean(speeds[-fps:]), np.max(speeds[-fps*3:]), np.mean(speeds[-fps*30]))
                     for track_id, speeds in track_speed_history.items()]
             speed_to_print.sort(key=lambda x: x[0])
 
@@ -206,6 +209,7 @@ if __name__ == "__main__":
             # draw the area we will be estimating speed
             image = cv2.rectangle(image, (x_l, y_l), (x_r, y_r), (0, 255, 0), 2)
 
+            unit = "m/s"
             start_bottom_y = 680
             end_bottom_y = 680 - len(speed_to_print)*20
             image = cv2.rectangle(image, (0, end_bottom_y-1), (1280, start_bottom_y), (0, 0, 0), -1)
@@ -215,8 +219,8 @@ if __name__ == "__main__":
                 else:
                     track_name = "%s #%d" % (result.names[track_history[track_id][0][2]], track_id)
                 image = cv2.putText(
-                    image, "%s: current %.1f, max %.1f, avg. %.1f m/s" % (
-                        track_name, current_s, max_s, mean_s),
+                    image, "%s: speed in last 1 second %.1f, max %.1f in last 3 seconds, avg. %.1f %s in last 30 seconds" % (
+                        track_name, current_s, max_s, mean_s, unit),
                     (10, start_bottom_y), cv2.FONT_HERSHEY_SIMPLEX,
                     fontScale=1, color=(0, 255, 0), thickness=2)
                 start_bottom_y -= 10
@@ -236,8 +240,7 @@ if __name__ == "__main__":
                 out.write(image)
 
             # show the fps in the visualization
-            current_time = time.time()
-            fps = frame_count / (current_time - start_time)
+
             image = cv2.putText(
                 image, "FPS: %d" % int(fps),
                 (10, 710), cv2.FONT_HERSHEY_SIMPLEX,
