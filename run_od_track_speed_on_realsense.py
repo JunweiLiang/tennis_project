@@ -164,7 +164,7 @@ if __name__ == "__main__":
                 # save the data into a single track, assume only object in the scene (like a tennis ball)
                 class_for_speed_est = 32  # sports ball
                 # xy is the center point coordinate
-                boxes = [box.xywh for box in det_results[0].boxes if box.cls[0] == class_for_speed_est]
+                boxes = [box.xywh[0] for box in det_results[0].boxes if box.cls[0] == class_for_speed_est]
                 if len(boxes) > 0:
                     boxes_and_area = [(xywh, xywh[2]*xywh[3]) for xywh in boxes]
                     boxes_and_area.sort(reverse=True, key=lambda x: x[1])
