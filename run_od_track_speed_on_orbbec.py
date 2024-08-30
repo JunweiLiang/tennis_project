@@ -61,11 +61,11 @@ def est_speed_on_tracks(track_history, depth_data, camera_param, track_speed_his
     # this is for realsense
     # for each track, get the latest 3D point and the last 3D points
     global x_l, x_r, y_l, y_r
+    current_depth = -1
     for track_id in track_history:
         track = track_history[track_id]
         # excluding any box around the edges, where depth is not good
         track = [x for x in track if x_l < x[0] and x[0] < x_r and y_l < x[1] and x[1] < y_r]
-        current_depth = -1
         if len(track) > 1:
             # integers coordinates
             current_x, current_y, cls_id, current_timestamp = track[-1]
