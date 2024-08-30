@@ -11,10 +11,15 @@ import datetime
 import time # for fps compute
 from collections import defaultdict
 
-# 1. install realsense-viewer through here:
-# https://github.com/IntelRealSense/librealsense/blob/development/doc/installation.md
-# 2. pip install pyrealsense2
-import pyrealsense2 as rs
+# install pyorbbecs through here:
+# https://github.com/orbbec/pyorbbecsdk
+# need to build a local wheel
+
+from pyorbbecsdk import Pipeline
+from pyorbbecsdk import Config
+from pyorbbecsdk import OBSensorType
+from pyorbbecsdk import OBAlignMode
+from pyorbbecsdk import OBFormat
 
 from utils import image_resize
 from utils import print_once
@@ -88,11 +93,7 @@ if __name__ == "__main__":
     # load the model first
     # initialize the object detection model
 
-    if args.det_only:
-        detection_classes = [32] #  0 person, 32 sports ball on COCO
-    else:
-        detection_classes = [0, 32] #  0 person, 32 sports ball on COCO
-
+    detection_classes = [32] #  0 person, 32 sports ball on COCO
     if args.use_open_model:
         detection_classes = ["person", "tennis ball"] # does not work yet
         # https://github.com/ultralytics/assets/releases/download/v8.2.0/yolov8x-worldv2.pt
@@ -104,24 +105,64 @@ if __name__ == "__main__":
         # see here for all the available models: https://docs.ultralytics.com/models/yolov9/#performance-on-ms-coco-dataset
         model = YOLO(args.yolo_model_name)
 
+    try:
+        pipeline = Pipeline()
+        config = Config()
+
+        # 1920x1080 only supports 15 fps for Femolt Bolt
+        color_profile = pipeline.get_stream_profile_list(OBSensorType.COLOR_SENSOR).get_video_stream_profile(1280, 960, OBFormat.RGB, 30)
+        # Up to 1024X1024@15fps (WFOV), 640X576@30fps (NFOV)
+        #depth_profile = pipeline.get_stream_profile_list(OBSensorType.DEPTH_SENSOR).get_default_video_stream_profile()
+        depth_profile = pipeline.get_stream_profile_list(OBSensorType.DEPTH_SENSOR).get_video_stream_profile(640, 576, OBFormat.Y16, 30)
 
 
-    # Configure RealSense pipeline for depth and RGB.
-    pipeline = rs.pipeline()
-    config = rs.config()
-    config.enable_stream(rs.stream.depth, 1280, 720, rs.format.z16, 30)
-    config.enable_stream(rs.stream.color, 1280, 720, rs.format.bgr8, 30)
-    profile = pipeline.start(config)
 
-    depth_sensor = profile.get_device().first_depth_sensor()
+        # color profile : 1920x1080@15_OBFormat.RGB
+        # default color profile : 1280x960@30_OBFormat.MJPG
+        print("color profile : {}x{}@{}_{}".format(color_profile.get_width(),
+                                               color_profile.get_height(),
+                                               color_profile.get_fps(),
+                                               color_profile.get_format()))
+        # default depth profile : 640x576@15_OBFormat.Y16
+        print("depth profile : {}x{}@{}_{}".format(depth_profile.get_width(),
+                                               depth_profile.get_height(),
+                                               depth_profile.get_fps(),
+                                               depth_profile.get_format()))
 
-    # depth_value * depth_scale -> meters
-    depth_scale = depth_sensor.get_depth_scale()  # 0.001
 
-    print("Depth Scale is: " , depth_scale)
-    print("aligning depth frame to RGB frames..") # depth sensor has different extrinsics with RGB sensor
-    align_to = rs.stream.color
-    aligner = rs.align(align_to)
+        config.enable_stream(color_profile)
+        config.enable_stream(depth_profile)
+        # HW_MODE does not work for Femolt Bolt
+        config.set_align_mode(OBAlignMode.SW_MODE) # align depth to the color image, at 15 fps
+
+        pipeline.enable_frame_sync()
+        pipeline.start(config)
+
+        camera_param = pipeline.get_camera_param()
+
+        # 坐标系原点设置： https://www.orbbec.com/documentation-mega/coordinate-systems/
+        # camera param 获取: https://github.com/orbbec/pyorbbecsdk/blob/main/test/test_pipeline.py#L35
+        """
+        print(camera_param.depth_intrinsic)
+        print(camera_param.rgb_intrinsic)
+        print(camera_param.depth_distortion)
+        print(camera_param.rgb_distortion)
+        print(camera_param.transform)
+
+        print(camera_param.rgb_intrinsic.fx)
+
+        <OBCameraIntrinsic fx=997.648743 fy=996.949890 cx=632.307373 cy=490.477325 width=1280 height=960>
+        <OBCameraIntrinsic fx=997.648743 fy=996.949890 cx=632.307373 cy=490.477325 width=1280 height=960>
+        <OBCameraDistortion k1=0.073824 k2=-0.100994 k3=0.040822 k4=0.000000 k5=0.000000 k6=0.000000 p1=-0.000142 p2=-0.000074>
+        <OBCameraDistortion k1=0.073824 k2=-0.100994 k3=0.040822 k4=0.000000 k5=0.000000 k6=0.000000 p1=-0.000142 p2=-0.000074>
+        <OBD2CTransform rot=[1, 0, 0, 0, 1, 0, 0, 0, 1]
+        transform=[0, 0, 0]
+        997.6487426757812
+        """
+
+    except Exception as e:
+        print(e)
+        sys.exit()
 
 
     print("Now showing the camera stream. press Q to exit.")

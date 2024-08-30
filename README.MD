@@ -21,5 +21,31 @@ This repo contains clean exercise code for:
     tennis_project$ python get_depth_images_orbbec.py --save_to_avi orbbec_rgb_only.avi --save_data_only
     ```
 
+### Pipeline to Do Tennis Ball Speed Estimation with Depth Camera
+
++ Camera setup: One on a 4-meter tripod tilted down to look like boardcasting angle, only RGB used; One on a 1.5-meter tripod near one corner, we can estimate one player at one side (from baseline to serve line) with a depth camera more reliably.
++ Run depth visualization to make sure the depth camera works using the court lines
+    ```
+    # baseline to net: 11.88 m
+    # baseline to serve line: 5.48m
+    # Singles side line to Doubles side line: 1.37m ; this can be used for checking
+
+    # for realsense
+    (base) junweil@precognition-laptop2:~/projects/tennis_project$ python get_depth_images.py --save_to_avi speed_rs_depth_vis.avi
+
+    ```
++ Run tennis ball speed estimation (visualization and saving to a video file). It is recommended to use detection only, assuming only one ball in sight:
+    ```
+    (base) junweil@precognition-laptop2:~/projects/tennis_project$ python run_od_track_speed_on_realsense.py --yolo_model_name yolov10x.pt --det_conf 0.05 --tracker_yaml bytetrack_fastobj.yaml --det_only --save_to_avi speed_rs_det.avi
+    # --use_kmh to switch to km/h
+    ```
+
++ The tracking is not good for fast moving object:
+    ```
+    (base) junweil@precognition-laptop2:~/projects/tennis_project$ python run_od_track_speed_on_realsense.py --yolo_model_name yolov10x.pt --det_conf 0.05 --tracker_yaml bytetrack_fastobj.yaml --save_to_avi speed_rs_track.avi
+    ```
+
++ You can see the example visualization videos in the example folder. The marker length is 1 meter.
+
 ### Other potential resources
 + From Roboflow `https://universe.roboflow.com/search?q=class%3Atennis-ball`
