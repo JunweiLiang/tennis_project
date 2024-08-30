@@ -53,7 +53,7 @@ def get_orbbec_depth_data(orbbec_depth_frame):
     scale = orbbec_depth_frame.get_depth_scale() # scale is 1.0, the HW are in milimeters
     scale = 0.001 # I want them in meters
 
-    depth_data = np.frombuffer(depth_frame.get_data(), dtype=np.uint16)
+    depth_data = np.frombuffer(orbbec_depth_frame.get_data(), dtype=np.uint16)
     depth_data = depth_data.reshape((height, width))
     depth_data = depth_data.astype(np.float32) * scale
 
