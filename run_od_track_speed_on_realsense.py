@@ -9,6 +9,7 @@ import argparse
 import numpy as np
 import datetime
 import time # for fps compute
+from collections import defaultdict
 
 # 1. install realsense-viewer through here:
 # https://github.com/IntelRealSense/librealsense/blob/development/doc/installation.md
@@ -17,7 +18,9 @@ import pyrealsense2 as rs
 
 from utils import image_resize
 from utils import print_once
-from collections import defaultdict
+
+from utils import run_od_on_image
+from utils import run_od_track_on_image
 
 # This is a good open-source wrapper
 # pip install ultralytics
@@ -40,122 +43,34 @@ parser.add_argument("--tracker_yaml", default="bytetrack.yaml")
 parser.add_argument("--use_open_model", action="store_true")
 parser.add_argument("--det_only", action="store_true")
 
-def show_point_depth(point, depth_image, color_image):
-    """
-        point: (y, x)
-    """
-    depth = depth_image[point[0], point[1]]  # in milimeters
-    color_image = cv2.circle(
-        color_image,
-        (point[1], point[0]), radius=2, color=(0, 255, 0), thickness=2)
-    color_image = cv2.putText(
-        color_image, "depth: %dmm" % int(depth),
-        (point[1], point[0]-20), cv2.FONT_HERSHEY_SIMPLEX,
-        fontScale=1, color=(0, 255, 0), thickness=2)
-    return color_image, depth
+def est_speed_on_tracks(track_history, depth_data, depth_intrin, track_speed_history):
+    # this is for realsense
+    # for each track, get the latest 3D point and the last 3D points
+    for track_id in track_history:
+        tracks = track_history[track_id]
+        if len(tracks) > 1:
+            # integers coordinates
+            current_x, current_y, cls_id, current_timestamp = tracks[-1]
+            last_x, last_y, _, last_timestamp = tracks[-2]
 
+            # in meters
+            current_depth = depth_data[current_y, current_x]
+            last_depth =depth_data[last_y, last_x]
 
-def run_od_on_image(
-        frame_cv2, od_model,
-        classes=[], conf=0.5,
-        bbox_thickness=4, text_thickness=2, font_size=2):
-    """
-        run object detection inference and visualize in the image
-    """
+            current_point3d = rs.rs2_deproject_pixel_to_point(
+                depth_intrin,
+                (current_x, current_y),
+                current_depth)
+            last_point3d = rs.rs2_deproject_pixel_to_point(
+                depth_intrin,
+                (last_x, last_y),
+                last_depth)
 
-    # see here for inference arguments
-    # https://docs.ultralytics.com/modes/predict/#inference-arguments
-    results = od_model.predict(
-        frame_cv2,
-        classes=None if len(classes)==0 else classes,  # you can specify the classes you want
-        # see here for coco class indexes [0-79], 0 is person: https://gist.github.com/AruniRC/7b3dadd004da04c80198557db5da4bda
-        #classes=[0, 32], # detect person and sports ball only
-        conf=conf,
-        #half=True
-        )
+            dist = np.linalg.norm(np.array(current_point3d) - np.array(last_point3d))
+            speed = dist / (current_timestamp - last_timestamp) # meters / second
 
-    # see here for the API documentation of results
-    # https://docs.ultralytics.com/modes/predict/#working-with-results
-    result = results[0] # we run it on single image
-    for box in result.boxes:
-        bbox = [int(x) for x in box.xyxy[0]]
-        bbox_color = (0, 255, 0) # BGR
-        frame_cv2 = cv2.rectangle(
-                frame_cv2,
-                tuple(bbox[0:2]), tuple(bbox[2:4]),
-                bbox_color, bbox_thickness)
-
-        frame_cv2 = cv2.putText(
-                frame_cv2, "%s" % result.names[int(box.cls[0])],
-                (bbox[0], bbox[1] - 10),  # specify the bottom left corner
-                cv2.FONT_HERSHEY_PLAIN, font_size,
-                bbox_color, text_thickness)
-    return frame_cv2, results
-
-def run_od_track_on_image(
-        frame_cv2, od_model, track_history,
-        classes=[], conf=0.5,
-        tracker_yaml="bytetrack.yaml", # https://github.com/ultralytics/ultralytics/blob/main/ultralytics/cfg/trackers/bytetrack.yaml
-        bbox_thickness=4, text_thickness=2, font_size=2):
-    """
-        run object detection and tracking on a new frame, and visualize
-    """
-
-    # see here for inference arguments
-    # https://docs.ultralytics.com/modes/track/#tracking
-    results = od_model.track(
-        frame_cv2,
-        tracker=tracker_yaml,
-        #tracker="botsort.yaml",
-        classes=None if len(classes)==0 else classes,  # you can specify the classes you want
-        # see here for coco class indexes [0-79], 0 is person: https://gist.github.com/AruniRC/7b3dadd004da04c80198557db5da4bda
-        #classes=[0, 32], # detect person and sports ball only
-        conf=conf,
-        iou=0.5, #NMS. Lower values result in fewer detections by eliminating overlapping boxes
-        persist=True
-        )
-
-    # see here for the API documentation of results
-    # https://docs.ultralytics.com/modes/predict/#working-with-results
-    result = results[0]
-
-    time_now = time.time()
-
-    # Get the boxes and track IDs for ploting the lines
-    boxes = result.boxes.xywh.cpu()
-    # only visualize when there are tracks
-    if result.boxes.id is not None:
-        boxes_xyxy = result.boxes.xyxy.cpu()
-        track_ids = result.boxes.id.int().cpu().tolist()
-        classes = result.boxes.cls.int().cpu().tolist()
-
-        for box, box_xyxy, track_id, cls_id in zip(boxes, boxes_xyxy, track_ids, classes):
-            center_x, center_y, w, h = box
-            x1, y1, x2, y2 = box_xyxy
-
-            bbox_color = (255, 0, 0) # BGR
-
-            frame_cv2 = cv2.rectangle(
-                    frame_cv2,
-                    (int(x1), int(y1)), (int(x2), int(y2)),
-                    bbox_color, bbox_thickness)
-
-            frame_cv2 = cv2.putText(
-                    frame_cv2, "%s #%d" % (result.names[cls_id], track_id),
-                    (int(x1), int(y1) - 10),  # specify the bottom left corner
-                    cv2.FONT_HERSHEY_PLAIN, font_size,
-                    bbox_color, text_thickness)
-
-            # plot the trace
-            track = track_history[track_id]
-            track.append((float(center_x), float(center_y), cls_id, time_now))
-            if len(track) > 30:
-                track.pop(0)
-
-            points = np.hstack([ (x[0], x[1]) for x in track]).astype(np.int32).reshape((-1, 1, 2))
-            cv2.polylines(frame_cv2, [points], isClosed=False, color=(230, 230, 230), thickness=8)
-
-    return frame_cv2, results
+            track_speed = track_speed_history[track_id]
+            track_speed.append(speed)
 
 
 if __name__ == "__main__":
@@ -164,7 +79,7 @@ if __name__ == "__main__":
     # load the model first
     # initialize the object detection model
 
-    detection_classes = [32] # person, sports ball on COCO
+    detection_classes = [32] #  0 person, 32 sports ball on COCO
     if args.use_open_model:
         detection_classes = ["person", "tennis ball"] # does not work yet
         # https://github.com/ultralytics/assets/releases/download/v8.2.0/yolov8x-worldv2.pt
@@ -213,7 +128,8 @@ if __name__ == "__main__":
 
 
         # Store the track history
-        track_history = defaultdict(lambda: [])
+        track_history = defaultdict([])
+        track_speed_history = defaultdict([])
 
         while True:
             # Wait for a coherent pair of frames: depth and color
@@ -231,28 +147,68 @@ if __name__ == "__main__":
             # frame_count start from 1
             frame_count += 1
 
-
             # Convert images to numpy arrays
-            depth_image = np.asanyarray(depth_frame.get_data())
             color_image = np.asanyarray(color_frame.get_data())
-            # (720, 1280, 3), (720, 1280)
-            #print(color_image.shape, depth_image.shape)
-            #print(depth_image[240, 320]) # 单位：毫米
+
+            # mm to meters
+            depth_data = np.asanyarray(depth_frame.get_data()) * depth_scale
+            depth_intrin = depth_frame.profile.as_video_stream_profile().intrinsics  # 获取深度参数（像素坐标系转相机坐标系会用到）
 
             # see here for inference arguments
             # https://docs.ultralytics.com/modes/predict/#inference-arguments
             if args.det_only:
-                color_image, _ = run_od_on_image(
+                color_image, det_results = run_od_on_image(
                         color_image, model, classes=detection_classes, conf=args.det_conf,
                         bbox_thickness=4) # larger box to be overwritten by track results
+
+                # save the data into a single track, assume only object in the scene (like a tennis ball)
+                class_for_speed_est = 32  # sports ball
+                # xy is the center point coordinate
+                boxes = [box.xywh for box in det_results[0] if box.cls[0] == class_for_speed_est]
+                if len(boxes) > 0:
+                    boxes_and_area = [(xywh, xywh[2]*xywh[3]) for xywh in boxes]
+                    boxes_and_area.sort(reverse=True, key=lambda x: x[1])
+                    # only keeping the largest one
+                    center_x, center_y, _, _ = boxes_and_area[0][0]
+                    current_timestamp = time.time()
+                    track_history["tennis ball"].append((center_x, center_y, 0, current_timestamp))
+
             else:
 
-                color_image, results = run_od_track_on_image(
+                color_image, track_results = run_od_track_on_image(
                     color_image, model, track_history,
                     classes=detection_classes, conf=args.det_conf,
                     tracker_yaml=args.tracker_yaml)
 
+                result = track_results[0]
+
+            # get track_id -> a list of speed, the last one is the latest speed
+            est_speed_on_tracks(
+                track_history, depth_data, depth_intrin,
+                track_speed_history)
+
+            # print out the speed on the image (trackid, current speed, max speed, mean speed)
+            speed_to_print = [
+                    (track_id, speeds[-1], np.max(speeds), np.mean(speeds))
+                    for track_id, speeds in track_speed_history.items()]
+            speed_to_print.sort(key=lambda x: x[0])
+
             image = color_image
+
+            start_bottom_y = 700
+            end_bottom_y = 700 - len(speed_to_print)*10
+            image = cv2.rectangle(image, (0, end_bottom_y), (1280, start_bottom_y), (255, 255, 255), -1)
+            for i, (track_id, current_s, max_s, mean_s) in enumerate(speed_to_print):
+                if type(track_id) is str:
+                    track_name = track_id
+                else:
+                    track_name = "%s #%d" % (result.names[track_history[track_id][0][2]], track_id)
+                image = cv2.putText(
+                    image, "%s: current %.1f, max %.1f, avg. %.1f m/s" % (
+                        track_name, current_s, max_s, mean_s),
+                    (10, start_bottom_y), cv2.FONT_HERSHEY_SIMPLEX,
+                    fontScale=1, color=(0, 255, 0), thickness=2)
+                start_bottom_y -= 10
 
             # put a timestamp for the frame for possible synchronization
             # and a frame index to look up depth data
@@ -271,7 +227,7 @@ if __name__ == "__main__":
             fps = frame_count / (current_time - start_time)
             image = cv2.putText(
                 image, "FPS: %d" % int(fps),
-                (10, 700), cv2.FONT_HERSHEY_SIMPLEX,
+                (10, 710), cv2.FONT_HERSHEY_SIMPLEX,
                 fontScale=1, color=(0, 0, 255), thickness=2)
 
             # Show the image

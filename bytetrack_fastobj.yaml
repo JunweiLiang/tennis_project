@@ -8,7 +8,7 @@ track_high_thresh: 0.1 # threshold for the first association # original 0.5
 track_low_thresh: 0.05 # threshold for the second association
 
 # This is the threshold used for starting a new track. If a detection doesn't match any existing tracks and its score is above this threshold, a new track will be initialized.
-new_track_thresh: 0.1 # threshold for init new track if the detection does not match any tracks # original 0.6
+new_track_thresh: 0.6 # threshold for init new track if the detection does not match any tracks # original 0.6
 
 # in frames, so 30 fps, track_buffer==30, it will keep track for 1 second
 track_buffer: 60 # buffer to calculate the time when to remove tracks original 30
