@@ -56,6 +56,7 @@ parser.add_argument("--use_kmh", action="store_true")
 # for each track, get the latest 3D point and the last 3D points
 x_l, x_r, y_l, y_r = 100, 1280 - 100, 50, 960 - 50
 
+
 def est_speed_on_tracks(track_history, depth_data, camera_param, track_speed_history):
     # this is for realsense
     # for each track, get the latest 3D point and the last 3D points
@@ -64,6 +65,7 @@ def est_speed_on_tracks(track_history, depth_data, camera_param, track_speed_his
         track = track_history[track_id]
         # excluding any box around the edges, where depth is not good
         track = [x for x in track if x_l < x[0] and x[0] < x_r and y_l < x[1] and x[1] < y_r]
+        current_depth = -1
         if len(track) > 1:
             # integers coordinates
             current_x, current_y, cls_id, current_timestamp = track[-1]
@@ -71,7 +73,7 @@ def est_speed_on_tracks(track_history, depth_data, camera_param, track_speed_his
 
             # in meters
             current_depth = depth_data[current_y, current_x]
-            last_depth =depth_data[last_y, last_x]
+            last_depth = depth_data[last_y, last_x]
 
             current_point3d = deproject_pixel_to_point(
                 camera_param,
@@ -89,6 +91,8 @@ def est_speed_on_tracks(track_history, depth_data, camera_param, track_speed_his
             track_speed.append(speed)
             if len(track_speed) > 9000:  # the queue is larger than the data we need
                 track_speed.pop(0)
+
+    return current_depth
 
 
 if __name__ == "__main__":
@@ -232,7 +236,7 @@ if __name__ == "__main__":
                 result = track_results[0]
 
             # get track_id -> a list of speed, the last one is the latest speed
-            est_speed_on_tracks(
+            depth = est_speed_on_tracks(
                 track_history, depth_data, camera_param,
                 track_speed_history)
 
@@ -264,8 +268,8 @@ if __name__ == "__main__":
                 else:
                     track_name = "%s #%d" % (result.names[track_history[track_id][0][2]], track_id)
                 image = cv2.putText(
-                    image, "%s: speed in last 1s %.1f, max %.1f in last 3s, avg. %.1f %s in last 30s" % (
-                        track_name, current_s, max_s, mean_s, unit),
+                    image, "%s: speed in last 1s %.1f, max %.1f in last 3s, avg. %.1f %s in last 30s, d: %.1f" % (
+                        track_name, current_s, max_s, mean_s, unit, depth),
                     (10, start_bottom_y), cv2.FONT_HERSHEY_SIMPLEX,
                     fontScale=0.8, color=(0, 255, 0), thickness=2)
                 start_bottom_y -= 25
