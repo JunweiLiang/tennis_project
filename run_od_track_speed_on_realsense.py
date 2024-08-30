@@ -200,7 +200,7 @@ if __name__ == "__main__":
             # print out the speed on the image (trackid, current speed, max speed, mean speed)
             speed_to_print = [
                     #(track_id, np.mean(speeds[-30:-1]), np.percentile(speeds, 95), np.mean(speeds))
-                    (track_id, np.mean(speeds[-fps:]), np.max(speeds[-fps*3:]), np.mean(speeds[-fps*30]))
+                    (track_id, np.mean(speeds[-fps:]), np.max(speeds[-fps*3:]), np.mean(speeds[-fps*30:]))
                     for track_id, speeds in track_speed_history.items()]
             speed_to_print.sort(key=lambda x: x[0])
 
@@ -219,10 +219,10 @@ if __name__ == "__main__":
                 else:
                     track_name = "%s #%d" % (result.names[track_history[track_id][0][2]], track_id)
                 image = cv2.putText(
-                    image, "%s: speed in last 1 second %.1f, max %.1f in last 3 seconds, avg. %.1f %s in last 30 seconds" % (
+                    image, "%s: speed in last 1s %.1f, max %.1f in last 3s, avg. %.1f %s in last 30s" % (
                         track_name, current_s, max_s, mean_s, unit),
                     (10, start_bottom_y), cv2.FONT_HERSHEY_SIMPLEX,
-                    fontScale=1, color=(0, 255, 0), thickness=2)
+                    fontScale=0.8, color=(0, 255, 0), thickness=2)
                 start_bottom_y -= 10
 
             # put a timestamp for the frame for possible synchronization
