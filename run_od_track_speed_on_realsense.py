@@ -128,8 +128,8 @@ if __name__ == "__main__":
 
 
         # Store the track history
-        track_history = defaultdict([])
-        track_speed_history = defaultdict([])
+        track_history = defaultdict(list)
+        track_speed_history = defaultdict(list)
 
         while True:
             # Wait for a coherent pair of frames: depth and color
