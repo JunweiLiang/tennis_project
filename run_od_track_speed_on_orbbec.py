@@ -269,11 +269,15 @@ if __name__ == "__main__":
                     track_name = track_id
                 else:
                     track_name = "%s #%d" % (result.names[track_history[track_id][0][2]], track_id)
+                """
                 image = cv2.putText(
-                    image, "%s: speed in last 1s %.1f, max %.1f in last 3s, avg. %.1f %s in last 30s, d: %s" % (
-                        track_name, current_s, max_s, mean_s, unit, depth),
+                    image, "%s: speed in last 1s %.1f, max %.1f in last 3s, avg. %.1f %s in last 30s" % (
+                        track_name, current_s, max_s, mean_s, unit),
                     (10, start_bottom_y), cv2.FONT_HERSHEY_SIMPLEX,
                     fontScale=0.8, color=(0, 255, 0), thickness=2)
+                """
+                image = cv2.putText(image, "%s" % depth, cv2.FONT_HERSHEY_SIMPLEX,
+                    fontScale=0.8, color=(0, 255, 0), thickness=2) # for debug
                 start_bottom_y -= 25
 
             # put a timestamp for the frame for possible synchronization
