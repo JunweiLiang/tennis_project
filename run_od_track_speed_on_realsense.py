@@ -42,6 +42,7 @@ parser.add_argument("--yolo_model_name", default="yolov10x.pt")
 parser.add_argument("--tracker_yaml", default="bytetrack.yaml")
 parser.add_argument("--use_open_model", action="store_true")
 parser.add_argument("--det_only", action="store_true")
+parser.add_argument("--use_kmh", action="store_true")
 
 # for each track, get the latest 3D point and the last 3D points
 x_l, x_r, y_l, y_r = 100, 1280 - 100, 50, 720 - 50
@@ -212,6 +213,10 @@ if __name__ == "__main__":
             image = cv2.rectangle(image, (x_l, y_l), (x_r, y_r), (0, 255, 0), 2)
 
             unit = "m/s"
+            if args.use_kmh:
+                unit = "km/h"
+                speed_to_print = [(x[0], x[1]*3.6, x[2]*3.6, x[3]*3.6) for x in speed_to_print]
+
             start_bottom_y = 680
             end_bottom_y = 680 - len(speed_to_print)*20
             image = cv2.rectangle(image, (0, end_bottom_y-1), (1280, start_bottom_y), (0, 0, 0), -1)
