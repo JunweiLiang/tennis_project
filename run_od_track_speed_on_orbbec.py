@@ -276,7 +276,7 @@ if __name__ == "__main__":
                     (10, start_bottom_y), cv2.FONT_HERSHEY_SIMPLEX,
                     fontScale=0.8, color=(0, 255, 0), thickness=2)
                 """
-                image = cv2.putText(image, "%s" % depth, cv2.FONT_HERSHEY_SIMPLEX,
+                image = cv2.putText(image, "%s" % depth, (10, start_bottom_y), cv2.FONT_HERSHEY_SIMPLEX,
                     fontScale=0.8, color=(0, 255, 0), thickness=2) # for debug
                 start_bottom_y -= 25
 
