@@ -46,7 +46,7 @@ parser.add_argument("--det_only", action="store_true")
 def est_speed_on_tracks(track_history, depth_data, depth_intrin, track_speed_history):
     # this is for realsense
     # for each track, get the latest 3D point and the last 3D points
-    x_l, x_r, y_l, y_r = 50, 1280 - 50, 50, 720 - 50
+    x_l, x_r, y_l, y_r = 100, 1280 - 100, 50, 720 - 50
     for track_id in track_history:
         track = track_history[track_id]
         # excluding any box around the edges, where depth is not good
