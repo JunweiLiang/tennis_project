@@ -218,7 +218,7 @@ if __name__ == "__main__":
                 speed_to_print = [(x[0], x[1]*3.6, x[2]*3.6, x[3]*3.6) for x in speed_to_print]
 
             start_bottom_y = 680
-            end_bottom_y = 680 - len(speed_to_print)*30
+            end_bottom_y = 680 - len(speed_to_print)*25
             image = cv2.rectangle(image, (0, end_bottom_y-1), (1280, start_bottom_y), (0, 0, 0), -1)
             for i, (track_id, current_s, max_s, mean_s) in enumerate(speed_to_print):
                 if type(track_id) is str:
@@ -230,7 +230,7 @@ if __name__ == "__main__":
                         track_name, current_s, max_s, mean_s, unit),
                     (10, start_bottom_y), cv2.FONT_HERSHEY_SIMPLEX,
                     fontScale=0.8, color=(0, 255, 0), thickness=2)
-                start_bottom_y -= 10
+                start_bottom_y -= 25
 
             # put a timestamp for the frame for possible synchronization
             # and a frame index to look up depth data
