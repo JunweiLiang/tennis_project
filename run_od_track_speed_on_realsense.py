@@ -72,6 +72,8 @@ def est_speed_on_tracks(track_history, depth_data, depth_intrin, track_speed_his
 
             track_speed = track_speed_history[track_id]
             track_speed.append(speed)
+            if len(track_speed) > 3000:
+                track_speed.pop(0)
 
 
 if __name__ == "__main__":
@@ -196,9 +198,9 @@ if __name__ == "__main__":
 
             image = color_image
 
-            start_bottom_y = 700
-            end_bottom_y = 700 - len(speed_to_print)*10
-            image = cv2.rectangle(image, (0, end_bottom_y), (1280, start_bottom_y), (255, 255, 255), -1)
+            start_bottom_y = 670
+            end_bottom_y = 670 - len(speed_to_print)*40
+            image = cv2.rectangle(image, (0, end_bottom_y), (1280, start_bottom_y), (0, 0, 0), -1)
             for i, (track_id, current_s, max_s, mean_s) in enumerate(speed_to_print):
                 if type(track_id) is str:
                     track_name = track_id
