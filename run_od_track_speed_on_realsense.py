@@ -46,9 +46,11 @@ parser.add_argument("--det_only", action="store_true")
 def est_speed_on_tracks(track_history, depth_data, depth_intrin, track_speed_history):
     # this is for realsense
     # for each track, get the latest 3D point and the last 3D points
-    print(track_history)
+    x_l, x_r, y_l, y_r = 50, 1280 - 50, 50, 720 - 50
     for track_id in track_history:
         track = track_history[track_id]
+        # excluding any box around the edges, where depth is not good
+        track = [x for x in track if x_l < x[0] and x[0] < x_r and y_l < x[1] and x[1] < y_r]
         if len(track) > 1:
             # integers coordinates
             current_x, current_y, cls_id, current_timestamp = track[-1]
@@ -198,9 +200,9 @@ if __name__ == "__main__":
 
             image = color_image
 
-            start_bottom_y = 670
-            end_bottom_y = 670 - len(speed_to_print)*40
-            image = cv2.rectangle(image, (0, end_bottom_y), (1280, start_bottom_y), (0, 0, 0), -1)
+            start_bottom_y = 680
+            end_bottom_y = 680 - len(speed_to_print)*20
+            image = cv2.rectangle(image, (0, end_bottom_y-1), (1280, start_bottom_y), (0, 0, 0), -1)
             for i, (track_id, current_s, max_s, mean_s) in enumerate(speed_to_print):
                 if type(track_id) is str:
                     track_name = track_id
