@@ -13,6 +13,16 @@ import datetime
 from utils import image_resize
 from utils import print_once
 
+# install pyorbbecs through here:
+# https://github.com/orbbec/pyorbbecsdk
+# need to build a local wheel
+
+from pyorbbecsdk import Pipeline
+from pyorbbecsdk import Config
+from pyorbbecsdk import OBSensorType
+from pyorbbecsdk import OBAlignMode
+from pyorbbecsdk import OBFormat
+
 parser = argparse.ArgumentParser()
 
 parser.add_argument("--camera_type", default="orbbec")
@@ -136,15 +146,7 @@ if __name__ == "__main__":
     # lazy import API for specified depth camera
     if args.camera_type == "orbbec":
 
-        # install pyorbbecs through here:
-        # https://github.com/orbbec/pyorbbecsdk
-        # need to build a local wheel
 
-        from pyorbbecsdk import Pipeline
-        from pyorbbecsdk import Config
-        from pyorbbecsdk import OBSensorType
-        from pyorbbecsdk import OBAlignMode
-        from pyorbbecsdk import OBFormat
 
         # example from https://github.com/orbbec/pyorbbecsdk/blob/main/examples/depth_color_sync_align_viewer.py
         try:
