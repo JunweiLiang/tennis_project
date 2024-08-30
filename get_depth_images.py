@@ -172,7 +172,7 @@ if __name__ == "__main__":
                 # Stack both images horizontally
                 image = np.hstack((color_image, depth_colormap))
 
-                image = image_resize(image, width=1920, height=None)
+                image = image_resize(image, width=1280, height=None)
 
                 print_once("image shape: %s" % list(image.shape[:2]))
 
@@ -185,10 +185,6 @@ if __name__ == "__main__":
                 (10, 30), cv2.FONT_HERSHEY_SIMPLEX,
                 fontScale=1, color=(0, 0, 255), thickness=2)
 
-            if args.save_to_avi is not None:
-
-                out.write(image)
-
             # show the fps in the visualization
             current_time = time.time()
             fps = frame_count / (current_time - start_time)
@@ -196,6 +192,10 @@ if __name__ == "__main__":
                 image, "FPS: %d" % int(fps),
                 (10, 330), cv2.FONT_HERSHEY_SIMPLEX,
                 fontScale=1, color=(0, 0, 255), thickness=2)
+
+            if args.save_to_avi is not None:
+
+                out.write(image)
 
             # Show the image
             cv2.imshow('RGB and Depth Stream', image)
