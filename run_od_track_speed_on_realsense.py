@@ -227,7 +227,7 @@ if __name__ == "__main__":
                 fontScale=1, color=(0, 0, 255), thickness=2)
 
             # draw the area we will be estimating speed
-            image = cv2.rectangle(image, (x_l, y_l), (x_r, y_r), (0, 255, 0), -1)
+            image = cv2.rectangle(image, (x_l, y_l), (x_r, y_r), (0, 255, 0), 2)
 
             if args.save_to_avi is not None:
 
