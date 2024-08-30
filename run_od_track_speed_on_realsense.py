@@ -200,7 +200,9 @@ if __name__ == "__main__":
             # print out the speed on the image (trackid, current speed, max speed, mean speed)
             speed_to_print = [
                     #(track_id, np.mean(speeds[-30:-1]), np.percentile(speeds, 95), np.mean(speeds))
-                    (track_id, np.mean(speeds[-fps:]), np.max(speeds[-fps*3:]), np.mean(speeds[-fps*30:]))
+                    #(track_id, np.mean(speeds[-fps:]), np.max(speeds[-fps*3:]), np.mean(speeds[-fps*30:]))
+                    # top speed might be noisy, so we take 90th percentile
+                    (track_id, np.mean(speeds[-fps:]), np.percentile(speeds[-fps*3:], 90), np.mean(speeds[-fps*30:]))
                     for track_id, speeds in track_speed_history.items()]
             speed_to_print.sort(key=lambda x: x[0])
 
@@ -233,18 +235,16 @@ if __name__ == "__main__":
                 (10, 30), cv2.FONT_HERSHEY_SIMPLEX,
                 fontScale=1, color=(0, 0, 255), thickness=2)
 
-
-
-            if args.save_to_avi is not None:
-
-                out.write(image)
-
             # show the fps in the visualization
 
             image = cv2.putText(
                 image, "FPS: %d" % int(fps),
                 (10, 710), cv2.FONT_HERSHEY_SIMPLEX,
                 fontScale=1, color=(0, 0, 255), thickness=2)
+
+            if args.save_to_avi is not None:
+
+                out.write(image)
 
             # Show the image
             cv2.imshow('RGB and Depth Stream', image)
