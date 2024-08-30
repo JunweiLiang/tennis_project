@@ -172,7 +172,7 @@ if __name__ == "__main__":
                     # only keeping the largest one
                     center_x, center_y, _, _ = boxes_and_area[0][0]
                     current_timestamp = time.time()
-                    track_history["tennis ball"].append((center_x, center_y, 0, current_timestamp))
+                    track_history["tennis ball"].append((int(center_x), int(center_y), 0, current_timestamp))
 
             else:
 
