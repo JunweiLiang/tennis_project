@@ -203,6 +203,9 @@ if __name__ == "__main__":
 
             image = color_image
 
+            # draw the area we will be estimating speed
+            image = cv2.rectangle(image, (x_l, y_l), (x_r, y_r), (0, 255, 0), 2)
+
             start_bottom_y = 680
             end_bottom_y = 680 - len(speed_to_print)*20
             image = cv2.rectangle(image, (0, end_bottom_y-1), (1280, start_bottom_y), (0, 0, 0), -1)
@@ -226,8 +229,7 @@ if __name__ == "__main__":
                 (10, 30), cv2.FONT_HERSHEY_SIMPLEX,
                 fontScale=1, color=(0, 0, 255), thickness=2)
 
-            # draw the area we will be estimating speed
-            image = cv2.rectangle(image, (x_l, y_l), (x_r, y_r), (0, 255, 0), 2)
+
 
             if args.save_to_avi is not None:
 
