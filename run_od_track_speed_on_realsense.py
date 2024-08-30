@@ -194,7 +194,7 @@ if __name__ == "__main__":
 
             # print out the speed on the image (trackid, current speed, max speed, mean speed)
             speed_to_print = [
-                    (track_id, np.mean(speeds[-1:-30]), np.percentile(speeds, 95), np.mean(speeds))
+                    (track_id, np.mean(speeds[-30:-1]), np.percentile(speeds, 95), np.mean(speeds))
                     for track_id, speeds in track_speed_history.items()]
             speed_to_print.sort(key=lambda x: x[0])
 
