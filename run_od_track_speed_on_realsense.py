@@ -43,10 +43,13 @@ parser.add_argument("--tracker_yaml", default="bytetrack.yaml")
 parser.add_argument("--use_open_model", action="store_true")
 parser.add_argument("--det_only", action="store_true")
 
+# for each track, get the latest 3D point and the last 3D points
+x_l, x_r, y_l, y_r = 100, 1280 - 100, 50, 720 - 50
+
 def est_speed_on_tracks(track_history, depth_data, depth_intrin, track_speed_history):
     # this is for realsense
     # for each track, get the latest 3D point and the last 3D points
-    x_l, x_r, y_l, y_r = 100, 1280 - 100, 50, 720 - 50
+    global x_l, x_r, y_l, y_r
     for track_id in track_history:
         track = track_history[track_id]
         # excluding any box around the edges, where depth is not good
@@ -222,6 +225,9 @@ if __name__ == "__main__":
                 image, "#%d: %s" % (frame_count, date_time),
                 (10, 30), cv2.FONT_HERSHEY_SIMPLEX,
                 fontScale=1, color=(0, 0, 255), thickness=2)
+
+            # draw the area we will be estimating speed
+            image = cv2.rectangle(image, (x_l, y_l), (x_r, y_r), (0, 255, 0), -1)
 
             if args.save_to_avi is not None:
 
