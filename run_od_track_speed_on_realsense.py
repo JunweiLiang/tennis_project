@@ -166,6 +166,7 @@ if __name__ == "__main__":
                 # xy is the center point coordinate
                 boxes = [box.xywh.cpu() for box in det_results[0].boxes if box.cls[0] == class_for_speed_est]
                 if len(boxes) > 0:
+                    print(boxes)
                     boxes_and_area = [(xywh, xywh[2]*xywh[3]) for xywh in boxes]
                     boxes_and_area.sort(reverse=True, key=lambda x: x[1])
                     # only keeping the largest one
