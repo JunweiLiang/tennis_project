@@ -32,17 +32,27 @@ This repo contains clean exercise code for:
 
     # for realsense
     (base) junweil@precognition-laptop2:~/projects/tennis_project$ python get_depth_images.py --save_to_avi speed_rs_depth_vis.avi
+    # for orbbec Femoto Bolt
+    (base) junweil@precognition-laptop2:~/projects/tennis_project$ python get_depth_images_orbbec.py --save_to_avi speed_orbbec_depth_vis.avi
 
     ```
 + Run tennis ball speed estimation (visualization and saving to a video file). It is recommended to use detection only, assuming only one ball in sight:
     ```
+    # for realsense
     (base) junweil@precognition-laptop2:~/projects/tennis_project$ python run_od_track_speed_on_realsense.py --yolo_model_name yolov10x.pt --det_conf 0.05 --tracker_yaml bytetrack_fastobj.yaml --det_only --save_to_avi speed_rs_det.avi
     # --use_kmh to switch to km/h
+
+    # for orbbec Femoto Bolt
+    (base) junweil@precognition-laptop2:~/projects/tennis_project$ python run_od_track_speed_on_orbbec.py --yolo_model_name yolov10x.pt --det_conf 0.05 --tracker_yaml bytetrack_fastobj.yaml --det_only --save_to_avi speed_orbbec_det.avi
+
     ```
 
 + The tracking is not good for fast moving object:
     ```
     (base) junweil@precognition-laptop2:~/projects/tennis_project$ python run_od_track_speed_on_realsense.py --yolo_model_name yolov10x.pt --det_conf 0.05 --tracker_yaml bytetrack_fastobj.yaml --save_to_avi speed_rs_track.avi
+
+    # for orbbec Femoto Bolt
+    (base) junweil@precognition-laptop2:~/projects/tennis_project$ python run_od_track_speed_on_orbbec.py --yolo_model_name yolov10x.pt --det_conf 0.05 --tracker_yaml bytetrack_fastobj.yaml --save_to_avi speed_orbbec_track.avi
     ```
 
 + You can see the example visualization videos in the example folder. The marker length is 1 meter.
