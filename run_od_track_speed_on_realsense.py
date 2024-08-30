@@ -46,12 +46,13 @@ parser.add_argument("--det_only", action="store_true")
 def est_speed_on_tracks(track_history, depth_data, depth_intrin, track_speed_history):
     # this is for realsense
     # for each track, get the latest 3D point and the last 3D points
+    print(track_history)
     for track_id in track_history:
-        tracks = track_history[track_id]
-        if len(tracks) > 1:
+        track = track_history[track_id]
+        if len(track) > 1:
             # integers coordinates
-            current_x, current_y, cls_id, current_timestamp = tracks[-1]
-            last_x, last_y, _, last_timestamp = tracks[-2]
+            current_x, current_y, cls_id, current_timestamp = track[-1]
+            last_x, last_y, _, last_timestamp = track[-2]
 
             # in meters
             current_depth = depth_data[current_y, current_x]
