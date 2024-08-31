@@ -57,5 +57,10 @@ This repo contains clean exercise code for:
 
 + You can see the example visualization videos in the example folder. The marker length is 1 meter.
 
+### Future Work
+
++ 3D Visualization with multiple cameras. Need to calibrate all the cameras in the scene with their extrinsics, and put the tennis ball into 3D visualization.
++ With the above reliable ball tracking in 3D, we can do ball bounce detection and line calling
+
 ### Other potential resources
 + From Roboflow `https://universe.roboflow.com/search?q=class%3Atennis-ball`
