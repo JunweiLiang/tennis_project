@@ -264,8 +264,8 @@ if __name__ == "__main__":
                 max_speed_text = "%d %s" % (max_speed, unit)
                 speed_image = np.zeros((image.shape[0], 1400, 3), dtype=np.uint8)
                 speed_image = cv2.putText(speed_image, max_speed_text,
-                    (10, image.shape[0]-10), cv2.FONT_HERSHEY_SIMPLEX,
-                    fontScale=8.0, color=(0, 255, 0), thickness=15)
+                    (10, image.shape[0]-200), cv2.FONT_HERSHEY_SIMPLEX,
+                    fontScale=9.0, color=(0, 255, 0), thickness=15)
 
                 image = np.hstack((image, speed_image))
 
