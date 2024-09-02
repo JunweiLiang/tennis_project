@@ -64,3 +64,4 @@ This repo contains clean exercise code for:
 
 ### Other potential resources
 + From Roboflow `https://universe.roboflow.com/search?q=class%3Atennis-ball`
++ This repo has a good perception component for tennis `https://core-robotics-lab.github.io/Wheelchair-Tennis-Robot/`

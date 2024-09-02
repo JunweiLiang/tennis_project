@@ -25,7 +25,7 @@ from utils import run_od_track_on_image
 # This is a good open-source wrapper
 # pip install ultralytics
 # see tutorial here
-#   1. https://docs.ultralytics.com/models/yolov9/
+#   1. https://docs.ultralytics.com/models/yolov10/
 #   2. https://medium.com/@Mert.A/how-to-use-yolov9-for-object-detection-93598ad88d7d
 from ultralytics import YOLO
 from ultralytics import YOLOWorld
@@ -43,6 +43,7 @@ parser.add_argument("--tracker_yaml", default="bytetrack.yaml")
 parser.add_argument("--use_open_model", action="store_true")
 parser.add_argument("--det_only", action="store_true")
 parser.add_argument("--use_kmh", action="store_true")
+parser.add_argument("--show_max_speed", action="store_true")
 
 # for each track, get the latest 3D point and the last 3D points
 x_l, x_r, y_l, y_r = 100, 1280 - 100, 50, 720 - 50
@@ -235,6 +236,9 @@ if __name__ == "__main__":
                     fontScale=0.8, color=(0, 255, 0), thickness=2)
                 start_bottom_y -= 25
 
+
+
+
             # put a timestamp for the frame for possible synchronization
             # and a frame index to look up depth data
             date_time = str(datetime.datetime.now())
@@ -253,6 +257,17 @@ if __name__ == "__main__":
             if args.save_to_avi is not None:
 
                 out.write(image)
+
+            if args.show_max_speed:
+                # add a big screen to show the first max speed
+                max_speed = speed_to_print[2] if speed_to_print else 0
+                max_speed_text = "%d %s" % (max_speed, unit)
+                speed_image = np.zeros((image.shape[0], 300, 3), dtype=np.uint8)
+                speed_image = cv2.putText(speed_image, max_speed_text,
+                    (100, 10), cv2.FONT_HERSHEY_SIMPLEX,
+                    fontScale=4.0, color=(0, 255, 0), thickness=4)
+
+                image = np.hstack((image, speed_image))
 
             # Show the image
             cv2.imshow('RGB and Depth Stream', image)
