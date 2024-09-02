@@ -52,6 +52,7 @@ parser.add_argument("--tracker_yaml", default="bytetrack.yaml")
 parser.add_argument("--use_open_model", action="store_true")
 parser.add_argument("--det_only", action="store_true")
 parser.add_argument("--use_kmh", action="store_true")
+parser.add_argument("--show_max_speed", action="store_true")
 
 # for each track, get the latest 3D point and the last 3D points
 x_l, x_r, y_l, y_r = 100, 1280 - 100, 50, 960 - 50
@@ -298,6 +299,17 @@ if __name__ == "__main__":
             if args.save_to_avi is not None:
 
                 out.write(image)
+
+            if args.show_max_speed:
+                # add a big screen to show the first max speed
+                max_speed = speed_to_print[0][2] if speed_to_print else 0
+                max_speed_text = "%d %s" % (max_speed, unit)
+                speed_image = np.zeros((image.shape[0], 1500, 3), dtype=np.uint8)
+                speed_image = cv2.putText(speed_image, max_speed_text,
+                    (10, image.shape[0]-200), cv2.FONT_HERSHEY_SIMPLEX,
+                    fontScale=9.0, color=(0, 255, 0), thickness=15)
+
+                image = np.hstack((image, speed_image))
 
             # Show the image
             cv2.imshow('RGB and Depth Stream', image)
