@@ -262,10 +262,10 @@ if __name__ == "__main__":
                 # add a big screen to show the first max speed
                 max_speed = speed_to_print[0][2] if speed_to_print else 0
                 max_speed_text = "%d %s" % (max_speed, unit)
-                speed_image = np.zeros((image.shape[0], 600, 3), dtype=np.uint8)
+                speed_image = np.zeros((image.shape[0], 1200, 3), dtype=np.uint8)
                 speed_image = cv2.putText(speed_image, max_speed_text,
                     (10, image.shape[0]-10), cv2.FONT_HERSHEY_SIMPLEX,
-                    fontScale=4.0, color=(0, 255, 0), thickness=4)
+                    fontScale=8.0, color=(0, 255, 0), thickness=8)
 
                 image = np.hstack((image, speed_image))
 
