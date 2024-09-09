@@ -108,10 +108,7 @@ def est_speed_on_tracks(track_history, depth_data, depth_intrin, speed_time_wind
 
             track_speed_dict[track_id].append(speed)
 
-    speed_to_print = [
-                    (track_id, speeds[-1], np.max(speeds), np.mean(speeds))
-                    for track_id, speeds in track_speed_dict.items()]
-    return speed_to_print
+    return track_speed_dict
 
 
 if __name__ == "__main__":
