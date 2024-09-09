@@ -44,22 +44,17 @@ parser.add_argument("--use_open_model", action="store_true")
 parser.add_argument("--det_only", action="store_true")
 parser.add_argument("--use_kmh", action="store_true")
 parser.add_argument("--show_max_speed", action="store_true")
+parser.add_argument("--speed_time_window", type=float, default=5.0)
 
 # for each track, get the latest 3D point and the last 3D points
 x_l, x_r, y_l, y_r = 100, 1280 - 100, 50, 720 - 50
 
 
 def est_speed_on_tracks(track_history, depth_data, depth_intrin, speed_time_window=5.0):
-    # speed_time_window = 5. # in seconds, we show the last speed/max speed/avg speed in the last speed_window seconds
-    # this is for realsense
-    # for each track, get the latest 3D point and the last 3D points
-    global x_l, x_r, y_l, y_r
-    # return a speed list with all the neighboring boxes of each tracks
+
     track_speed_dict = defaultdict(list)
     for track_id in track_history:
         track = track_history[track_id]
-        # excluding any box around the edges, where depth is not good
-        track = [x for x in track if x_l < x[0] and x[0] < x_r and y_l < x[1] and x[1] < y_r]
 
         # remove the track that are too long ago
         time_now = time.time()
@@ -82,9 +77,18 @@ def est_speed_on_tracks(track_history, depth_data, depth_intrin, speed_time_wind
 
             last_depth = depth_data[last_y, last_x]
 
+            # assuming the depth won't change much, which means our detection/tracking is good
+            if abs(current_depth - last_depth) > 55.0: # assuming the ball does not exceed 200 km/h in two frames
+                continue
+
             # RealSense depth data might contain invalid or zero-depth values
-            if current_depth <= 0 or last_depth <= 0:
+            # skipping some small values
+            if current_depth <= 0.2 or last_depth <= 0.2:
                 continue  # skip this boxes if depth data is invalid
+
+            time_diff = current_timestamp - last_timestamp # in seconds
+            if time_diff <= 0.01: # assuming our camera and algo running under 100 fps
+                continue
 
             current_point3d = rs.rs2_deproject_pixel_to_point(
                 depth_intrin,
@@ -96,11 +100,18 @@ def est_speed_on_tracks(track_history, depth_data, depth_intrin, speed_time_wind
                 last_depth)
 
             dist = np.linalg.norm(np.array(current_point3d) - np.array(last_point3d))
-            speed = dist / (current_timestamp - last_timestamp) # meters / second
+            speed = dist / time_diff # meters / second
+
+            max_reasonable_speed = 80.
+            if speed > max_reasonable_speed:  # e.g., max_reasonable_speed = 80 m/s
+                continue
 
             track_speed_dict[track_id].append(speed)
 
-    return track_speed_dict
+    speed_to_print = [
+                    (track_id, speeds[-1], np.max(speeds), np.mean(speeds))
+                    for track_id, speeds in track_speed_dict.items()]
+    return speed_to_print
 
 
 if __name__ == "__main__":
@@ -220,7 +231,7 @@ if __name__ == "__main__":
             # get track_id -> a list of speed, the speed is the adjacent boxes in the last speed_time_window seconds
             track_speed_dict = est_speed_on_tracks(
                 track_history, depth_data, depth_intrin,
-                speed_time_window=3.0)
+                speed_time_window=args.speed_time_window)
 
             # print out the speed on the image (trackid, current speed, max speed, mean speed)
             speed_to_print = [
