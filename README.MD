@@ -55,7 +55,10 @@ This repo contains clean exercise code for:
     (base) junweil@precognition-laptop2:~/projects/tennis_project$ python run_od_track_speed_on_orbbec.py --yolo_model_name yolov10x.pt --det_conf 0.05 --tracker_yaml bytetrack_fastobj.yaml --save_to_avi speed_orbbec_track.avi
     ```
 
-+ You can see the example visualization videos in the example folder. The marker length is 1 meter.
++ To verify our speed estimation code, we use a 1 meter marker and free drop a ball, which should have a maximum speed of 4.43 m/s. The marker length is 1 meter. See videos in `tennis_est_examples`:
+    ```
+    (base) junweil@precognition-laptop2:~/projects/tennis/tennis_project$ python run_od_track_speed_on_realsense.py --yolo yolov10m.pt --det_conf 0.01 --det_only --save tennis_est_examples/drop_ball_validate_1meter_4.4ms_yolov10mconf0.01.avi
+    ```
 
 ### Future Work
 

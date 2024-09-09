@@ -50,15 +50,18 @@ parser.add_argument("--speed_time_window", type=float, default=3.0)
 
 
 
-# for each track, get the latest 3D point and the last 3D points
+# excluding any box around the edges, where depth is not good
 x_l, x_r, y_l, y_r = 100, 1280 - 100, 50, 720 - 50
 
 
 def est_speed_on_tracks(track_history, depth_data, depth_intrin, speed_time_window=5.0):
-
+    global x_l, x_r, y_l, y_r
     track_speed_dict = defaultdict(list)
     for track_id in track_history:
         track = track_history[track_id]
+
+        # excluding any box around the edges, where depth is not good
+        track = [x for x in track if x_l < x[0] and x[0] < x_r and y_l < x[1] and x[1] < y_r]
 
         # remove the track that are too long ago
         time_now = time.time()

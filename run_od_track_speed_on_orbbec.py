@@ -53,28 +53,54 @@ parser.add_argument("--use_open_model", action="store_true")
 parser.add_argument("--det_only", action="store_true")
 parser.add_argument("--use_kmh", action="store_true")
 parser.add_argument("--show_max_speed", action="store_true")
+parser.add_argument("--speed_time_window", type=float, default=3.0)
 
-# for each track, get the latest 3D point and the last 3D points
+# excluding any box around the edges, where depth is not good
 x_l, x_r, y_l, y_r = 100, 1280 - 100, 50, 960 - 50
 
 
-def est_speed_on_tracks(track_history, depth_data, camera_param, track_speed_history):
-    # this is for realsense
+def est_speed_on_tracks(track_history, depth_data, camera_param, speed_time_window=5.0):
     # for each track, get the latest 3D point and the last 3D points
     global x_l, x_r, y_l, y_r
-    current_depth = -1
+    track_speed_dict = defaultdict(list)
     for track_id in track_history:
         track = track_history[track_id]
         # excluding any box around the edges, where depth is not good
         track = [x for x in track if x_l < x[0] and x[0] < x_r and y_l < x[1] and x[1] < y_r]
-        if len(track) > 1:
+
+        # remove the track that are too long ago
+        time_now = time.time()
+
+        # ignore the box outside of the current time_window
+        track = [x for x in track if time_now - x[3] < speed_time_window]
+
+        if len(track) < 2:
+            continue
+
+        # compute the speed between each neighboring boxes
+        frame_gap = 3 # we avoid using close adjacent frame to compute speed, since the time_diff might be too small
+        for box_before, box_later in zip(track[:-1], track[frame_gap:]):
+
             # integers coordinates
-            current_x, current_y, cls_id, current_timestamp = track[-1]
-            last_x, last_y, _, last_timestamp = track[-2]
+            current_x, current_y, cls_id, current_timestamp = box_later
+            last_x, last_y, _, last_timestamp = box_before
 
             # in meters
             current_depth = depth_data[current_y, current_x]
             last_depth = depth_data[last_y, last_x]
+
+            # assuming the depth won't change much, which means our detection/tracking is good
+            if abs(current_depth - last_depth) > 0.2: # assuming the ball does not exceed m/s in two frames
+                continue
+
+            # RealSense depth data might contain invalid or zero-depth values
+            # skipping some small values
+            if current_depth <= 0.2 or last_depth <= 0.2:
+                continue  # skip this boxes if depth data is invalid
+
+            time_diff = current_timestamp - last_timestamp # in seconds
+            if time_diff <= 0.05: # assuming our camera and algo running under 30 fps
+                continue
 
             current_point3d = deproject_pixel_to_point(
                 camera_param,
@@ -85,17 +111,17 @@ def est_speed_on_tracks(track_history, depth_data, camera_param, track_speed_his
                 (last_x, last_y),
                 last_depth)
 
-            current_depth = current_point3d
 
             dist = np.linalg.norm(np.array(current_point3d) - np.array(last_point3d))
-            speed = dist / (current_timestamp - last_timestamp) # meters / second
+            speed = dist / time_diff # meters / second
 
-            track_speed = track_speed_history[track_id]
-            track_speed.append(speed)
-            if len(track_speed) > 9000:  # the queue is larger than the data we need
-                track_speed.pop(0)
+            max_reasonable_speed = 80.
+            if speed > max_reasonable_speed:  # e.g., max_reasonable_speed = 80 m/s
+                continue
 
-    return current_depth
+            track_speed_dict[track_id].append(speed)
+
+    return track_speed_dict
 
 
 if __name__ == "__main__":
@@ -238,18 +264,17 @@ if __name__ == "__main__":
 
                 result = track_results[0]
 
-            # get track_id -> a list of speed, the last one is the latest speed
-            depth = est_speed_on_tracks(
+           # get track_id -> a list of speed, the speed is the adjacent boxes in the last speed_time_window seconds
+            track_speed_dict = est_speed_on_tracks(
                 track_history, depth_data, camera_param,
-                track_speed_history)
+                speed_time_window=args.speed_time_window)
 
             # print out the speed on the image (trackid, current speed, max speed, mean speed)
             speed_to_print = [
-                    #(track_id, np.mean(speeds[-30:-1]), np.percentile(speeds, 95), np.mean(speeds))
-                    #(track_id, np.mean(speeds[-fps:]), np.max(speeds[-fps*3:]), np.mean(speeds[-fps*30:]))
+                    (track_id, speeds[-1], np.max(speeds), np.mean(speeds))
                     # top speed might be noisy, so we take 90th percentile
-                    (track_id, np.mean(speeds[-fps:]), np.percentile(speeds[-fps*3:], 90), np.mean(speeds[-fps*30:]))
-                    for track_id, speeds in track_speed_history.items()]
+                    #(track_id, np.mean(speeds[-fps:]), np.percentile(speeds[-fps*3:], 90), np.mean(speeds[-fps*30:]))
+                    for track_id, speeds in track_speed_dict.items()]
             speed_to_print.sort(key=lambda x: x[0])
 
             image = color_image
@@ -272,8 +297,8 @@ if __name__ == "__main__":
                     track_name = "%s #%d" % (result.names[track_history[track_id][0][2]], track_id)
 
                 image = cv2.putText(
-                    image, "%s: speed in last 1s %.1f, max %.1f in last 3s, avg. %.1f %s in last 30s" % (
-                        track_name, current_s, max_s, mean_s, unit),
+                    image, "%s: speed in last frame is %.1f, max %.1f %s, avg.%.1f %s in the last %ds" % (
+                        track_name, current_s, max_s, unit, mean_s, unit, args.speed_time_window),
                     (10, start_bottom_y), cv2.FONT_HERSHEY_SIMPLEX,
                     fontScale=0.8, color=(0, 255, 0), thickness=2)
 
