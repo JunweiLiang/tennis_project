@@ -48,22 +48,43 @@ parser.add_argument("--show_max_speed", action="store_true")
 # for each track, get the latest 3D point and the last 3D points
 x_l, x_r, y_l, y_r = 100, 1280 - 100, 50, 720 - 50
 
-def est_speed_on_tracks(track_history, depth_data, depth_intrin, track_speed_history):
+
+def est_speed_on_tracks(track_history, depth_data, depth_intrin, speed_time_window=5.0):
+    # speed_time_window = 5. # in seconds, we show the last speed/max speed/avg speed in the last speed_window seconds
     # this is for realsense
     # for each track, get the latest 3D point and the last 3D points
     global x_l, x_r, y_l, y_r
+    # return a speed list with all the neighboring boxes of each tracks
+    track_speed_dict = defaultdict(list)
     for track_id in track_history:
         track = track_history[track_id]
         # excluding any box around the edges, where depth is not good
         track = [x for x in track if x_l < x[0] and x[0] < x_r and y_l < x[1] and x[1] < y_r]
-        if len(track) > 1:
+
+        # remove the track that are too long ago
+        time_now = time.time()
+
+        # ignore the box outside of the current time_window
+        track = [x for x in track if time_now - x[3] < speed_time_window]
+
+        if len(track) < 2:
+            continue
+
+        # compute the speed between each neighboring boxes
+        for box_before, box_later in zip(track[:-1], track[1:]):
+
             # integers coordinates
-            current_x, current_y, cls_id, current_timestamp = track[-1]
-            last_x, last_y, _, last_timestamp = track[-2]
+            current_x, current_y, cls_id, current_timestamp = box_later
+            last_x, last_y, _, last_timestamp = box_before
 
             # in meters
             current_depth = depth_data[current_y, current_x]
-            last_depth =depth_data[last_y, last_x]
+
+            last_depth = depth_data[last_y, last_x]
+
+            # RealSense depth data might contain invalid or zero-depth values
+            if current_depth <= 0 or last_depth <= 0:
+                continue  # skip this boxes if depth data is invalid
 
             current_point3d = rs.rs2_deproject_pixel_to_point(
                 depth_intrin,
@@ -77,10 +98,9 @@ def est_speed_on_tracks(track_history, depth_data, depth_intrin, track_speed_his
             dist = np.linalg.norm(np.array(current_point3d) - np.array(last_point3d))
             speed = dist / (current_timestamp - last_timestamp) # meters / second
 
-            track_speed = track_speed_history[track_id]
-            track_speed.append(speed)
-            if len(track_speed) > 3000:
-                track_speed.pop(0)
+            track_speed_dict[track_id].append(speed)
+
+    return track_speed_dict
 
 
 if __name__ == "__main__":
@@ -197,18 +217,17 @@ if __name__ == "__main__":
 
                 result = track_results[0]
 
-            # get track_id -> a list of speed, the last one is the latest speed
-            est_speed_on_tracks(
+            # get track_id -> a list of speed, the speed is the adjacent boxes in the last speed_time_window seconds
+            track_speed_dict = est_speed_on_tracks(
                 track_history, depth_data, depth_intrin,
-                track_speed_history)
+                speed_time_window=3.0)
 
             # print out the speed on the image (trackid, current speed, max speed, mean speed)
             speed_to_print = [
-                    #(track_id, np.mean(speeds[-30:-1]), np.percentile(speeds, 95), np.mean(speeds))
-                    #(track_id, np.mean(speeds[-fps:]), np.max(speeds[-fps*3:]), np.mean(speeds[-fps*30:]))
+                    (track_id, speeds[-1], np.max(speeds), np.mean(speeds))
                     # top speed might be noisy, so we take 90th percentile
-                    (track_id, np.mean(speeds[-fps:]), np.percentile(speeds[-fps*3:], 90), np.mean(speeds[-fps*30:]))
-                    for track_id, speeds in track_speed_history.items()]
+                    #(track_id, np.mean(speeds[-fps:]), np.percentile(speeds[-fps*3:], 90), np.mean(speeds[-fps*30:]))
+                    for track_id, speeds in track_speed_dict.items()]
             speed_to_print.sort(key=lambda x: x[0])
 
             image = color_image

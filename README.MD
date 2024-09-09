@@ -59,6 +59,7 @@ This repo contains clean exercise code for:
 
 ### Future Work
 
++ Use multiple high FPS (>= 60) RGB cameras for speed estimation. The depth camera has low FPS (30) and noisy depths, which makes it unrealiable for ball (fast object) speed estimation.
 + 3D Visualization with multiple cameras. Need to calibrate all the cameras in the scene with their extrinsics, and put the tennis ball into 3D visualization.
 + With the above reliable ball tracking in 3D, we can do ball bounce detection and line calling
 
