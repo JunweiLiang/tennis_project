@@ -92,7 +92,7 @@ def est_speed_on_tracks(track_history, depth_data, depth_intrin, speed_time_wind
                 continue  # skip this boxes if depth data is invalid
 
             time_diff = current_timestamp - last_timestamp # in seconds
-            if time_diff <= 0.05: # assuming our camera and algo running under 100 fps
+            if time_diff <= 0.05: # assuming our camera and algo running under 30 fps
                 continue
 
             current_point3d = rs.rs2_deproject_pixel_to_point(
@@ -262,8 +262,8 @@ if __name__ == "__main__":
                 else:
                     track_name = "%s #%d" % (result.names[track_history[track_id][0][2]], track_id)
                 image = cv2.putText(
-                    image, "%s: speed in last frame is %.1f, max %.1f/avg.%.1f %s in last %ds" % (
-                        track_name, current_s, max_s, mean_s, unit, args.speed_time_window),
+                    image, "%s: speed in last frame is %.1f, max %.1f %s, avg.%.1f %s in the last %ds" % (
+                        track_name, current_s, max_s, unit, mean_s, unit, args.speed_time_window),
                     (10, start_bottom_y), cv2.FONT_HERSHEY_SIMPLEX,
                     fontScale=0.8, color=(0, 255, 0), thickness=2)
                 start_bottom_y -= 25
