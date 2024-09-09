@@ -66,7 +66,7 @@ def est_speed_on_tracks(track_history, depth_data, depth_intrin, speed_time_wind
             continue
 
         # compute the speed between each neighboring boxes
-        frame_gap = 3 # we avoid using close adjacent frame to compute speed, since the time_diff might be too small
+        frame_gap = 1 # we avoid using close adjacent frame to compute speed, since the time_diff might be too small
         for box_before, box_later in zip(track[:-1], track[frame_gap:]):
 
             # integers coordinates
