@@ -46,6 +46,10 @@ parser.add_argument("--use_kmh", action="store_true")
 parser.add_argument("--show_max_speed", action="store_true")
 parser.add_argument("--speed_time_window", type=float, default=3.0)
 
+# this speed estimation, can be validate by free dropping a ball for 1 meter, the max speed should be 4.4 m/s
+
+
+
 # for each track, get the latest 3D point and the last 3D points
 x_l, x_r, y_l, y_r = 100, 1280 - 100, 50, 720 - 50
 
@@ -258,8 +262,8 @@ if __name__ == "__main__":
                 else:
                     track_name = "%s #%d" % (result.names[track_history[track_id][0][2]], track_id)
                 image = cv2.putText(
-                    image, "%s: speed in last 1s %.1f, max %.1f in last 3s, avg. %.1f %s in last 30s" % (
-                        track_name, current_s, max_s, mean_s, unit),
+                    image, "%s: speed in last frame is %.1f, max %.1f/avg.%.1f %s in last %ds" % (
+                        track_name, current_s, max_s, mean_s, unit, args.speed_time_window),
                     (10, start_bottom_y), cv2.FONT_HERSHEY_SIMPLEX,
                     fontScale=0.8, color=(0, 255, 0), thickness=2)
                 start_bottom_y -= 25
