@@ -44,7 +44,7 @@ parser.add_argument("--use_open_model", action="store_true")
 parser.add_argument("--det_only", action="store_true")
 parser.add_argument("--use_kmh", action="store_true")
 parser.add_argument("--show_max_speed", action="store_true")
-parser.add_argument("--speed_time_window", type=float, default=5.0)
+parser.add_argument("--speed_time_window", type=float, default=3.0)
 
 # for each track, get the latest 3D point and the last 3D points
 x_l, x_r, y_l, y_r = 100, 1280 - 100, 50, 720 - 50
@@ -66,7 +66,7 @@ def est_speed_on_tracks(track_history, depth_data, depth_intrin, speed_time_wind
             continue
 
         # compute the speed between each neighboring boxes
-        frame_gap = 1 # we avoid using close adjacent frame to compute speed, since the time_diff might be too small
+        frame_gap = 3 # we avoid using close adjacent frame to compute speed, since the time_diff might be too small
         for box_before, box_later in zip(track[:-1], track[frame_gap:]):
 
             # integers coordinates
