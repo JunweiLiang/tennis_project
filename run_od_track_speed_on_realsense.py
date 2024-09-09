@@ -66,7 +66,8 @@ def est_speed_on_tracks(track_history, depth_data, depth_intrin, speed_time_wind
             continue
 
         # compute the speed between each neighboring boxes
-        for box_before, box_later in zip(track[:-1], track[1:]):
+        frame_gap = 5 # we avoid using close adjacent frame to compute speed, since the time_diff might be too small
+        for box_before, box_later in zip(track[:-1], track[frame_gap:]):
 
             # integers coordinates
             current_x, current_y, cls_id, current_timestamp = box_later
@@ -78,7 +79,7 @@ def est_speed_on_tracks(track_history, depth_data, depth_intrin, speed_time_wind
             last_depth = depth_data[last_y, last_x]
 
             # assuming the depth won't change much, which means our detection/tracking is good
-            if abs(current_depth - last_depth) > 55.0: # assuming the ball does not exceed 200 km/h in two frames
+            if abs(current_depth - last_depth) > 0.2: # assuming the ball does not exceed m/s in two frames
                 continue
 
             # RealSense depth data might contain invalid or zero-depth values
@@ -87,7 +88,7 @@ def est_speed_on_tracks(track_history, depth_data, depth_intrin, speed_time_wind
                 continue  # skip this boxes if depth data is invalid
 
             time_diff = current_timestamp - last_timestamp # in seconds
-            if time_diff <= 0.01: # assuming our camera and algo running under 100 fps
+            if time_diff <= 0.05: # assuming our camera and algo running under 100 fps
                 continue
 
             current_point3d = rs.rs2_deproject_pixel_to_point(
