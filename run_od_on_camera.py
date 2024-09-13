@@ -17,15 +17,12 @@ from ultralytics import YOLO
 
 parser = argparse.ArgumentParser()
 
-parser.add_argument("--show_streaming",
-        action="store_true",
-        help="this will also open a window to see the camera stream, q to exit")
 parser.add_argument("--cam_num", type=int, default=0,
         help="camera num")
-parser.add_argument("output_image", help="grab a image from camera and save to this file")
+parser.add_argument("--output_image", help="grab a image from camera and save to this file")
 
 # example run on a macbook
-# junweiliang@work_laptop:~/Desktop/projects/tennis_project$ python run_od_on_camera.py --show_streaming --cam_num 1 ~/Downloads/od_test.jpg
+# junweiliang@work_laptop:~/Desktop/projects/tennis_project$ python run_od_on_camera.py  --cam_num 1
 # if you see
 #   [ WARN:0@0.012] global cap_v4l.cpp:999 open VIDEOIO(V4L2:/dev/video0): can't open camera by index
 # 可能需要在笔记本电脑上登录一下你的账号，唤醒一下摄像头
@@ -75,6 +72,15 @@ def run_od_on_image(
     return frame_cv2, results
 
 
+def count_people(det_results):
+    num_people = 0
+    result = det_results[0] # we run it on single image
+    for box in result.boxes:
+        if int(box.cls[0]) == 0:
+            num_people += 1
+    return num_people
+
+
 
 if __name__ == "__main__":
     args = parser.parse_args()
@@ -108,28 +114,35 @@ if __name__ == "__main__":
             print("------- end camera info ----")
 
 
-            if args.show_streaming:
+            print("Now showing the camera stream. press Q to exit.")
 
-                print("Now showing the camera stream. press Q to exit.")
+            while True:
+                ret, frame = cam.read()
+                if not ret:
+                    raise Exception("Error: Could not read frame from webcam.")
 
-                while True:
-                    ret, frame = cam.read()
-                    if not ret:
-                        raise Exception("Error: Could not read frame from webcam.")
+                frame, _ = run_od_on_image(frame, model)
 
-                    frame, _ = run_od_on_image(frame, model)
+                cv2.imshow("frame", frame)
 
-                    cv2.imshow("frame", frame)
-
-                    if cv2.waitKey(1) & 0xFF == ord('q'):
-                        break
+                if cv2.waitKey(1) & 0xFF == ord('q'):
+                    break
 
             result, image = cam.read()
 
             if result:
-                image, _ = run_od_on_image(image, model)
-                cv2.imwrite(args.output_image, image)
-                print("saved mediapiped image from web cam to %s" % args.output_image)
+                image, det_results = run_od_on_image(image, model)
+
+                num_people = count_people(det_results)
+
+                image = cv2.putText(
+                    image, "# People: %d" % num_people,
+                    (20, image.shape[0]-50), cv2.FONT_HERSHEY_SIMPLEX,
+                    fontScale=1.5, color=(0, 255, 0), thickness=4)
+
+                if args.output_image:
+                    cv2.imwrite(args.output_image, image)
+                    print("saved mediapiped image from web cam to %s" % args.output_image)
             else:
                 raise Exception("Failed to grab image from cam %s" % cam_num)
 

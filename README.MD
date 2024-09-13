@@ -5,7 +5,10 @@
 This repo contains clean exercise code for:
 
 + grab images from laptop cameras
-+ running yolo object detection on web cameras
++ running yolo object detection on web cameras (and count people)
+    ```
+
+    ```
 + running pose estimation on web cameras
 + grab depth images (and compute 3D point distances) using depth cameras (D455i, Femoto Bolt)
 + Show RGB and depth visualization and also save the visualization into a AVI video
