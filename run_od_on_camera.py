@@ -121,30 +121,24 @@ if __name__ == "__main__":
                 if not ret:
                     raise Exception("Error: Could not read frame from webcam.")
 
-                frame, _ = run_od_on_image(frame, model)
+                frame, det_results = run_od_on_image(frame, model)
+
+                num_people = count_people(det_results)
+
+                frame = cv2.rectangle(frame, (0, frame.shape[0]-20), (800, frame.shape[0]-120), (0, 0, 0), -1)
+                frame = cv2.putText(
+                    frame, "# People: %d" % num_people,
+                    (20, frame.shape[0]-40), cv2.FONT_HERSHEY_SIMPLEX,
+                    fontScale=3, color=(0, 255, 0), thickness=8)
 
                 cv2.imshow("frame", frame)
 
                 if cv2.waitKey(1) & 0xFF == ord('q'):
                     break
 
-            result, image = cam.read()
-
-            if result:
-                image, det_results = run_od_on_image(image, model)
-
-                num_people = count_people(det_results)
-
-                image = cv2.putText(
-                    image, "# People: %d" % num_people,
-                    (20, image.shape[0]-50), cv2.FONT_HERSHEY_SIMPLEX,
-                    fontScale=1.5, color=(0, 255, 0), thickness=4)
-
-                if args.output_image:
-                    cv2.imwrite(args.output_image, image)
-                    print("saved mediapiped image from web cam to %s" % args.output_image)
-            else:
-                raise Exception("Failed to grab image from cam %s" % cam_num)
+            if args.output_image:
+                cv2.imwrite(args.output_image, frame)
+                print("saved mediapiped image from web cam to %s" % args.output_image)
 
     finally:
         # release window

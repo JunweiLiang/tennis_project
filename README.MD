@@ -7,7 +7,7 @@ This repo contains clean exercise code for:
 + grab images from laptop cameras
 + running yolo object detection on web cameras (and count people)
     ```
-
+        $ python run_od_on_camera.py
     ```
 + running pose estimation on web cameras
 + grab depth images (and compute 3D point distances) using depth cameras (D455i, Femoto Bolt)
