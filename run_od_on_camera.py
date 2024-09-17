@@ -20,6 +20,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--cam_num", type=int, default=0,
         help="camera num")
 parser.add_argument("--output_image", help="grab a image from camera and save to this file")
+parser.add_argument("--model_name", default="yolov9t.pt")
 
 # example run on a macbook
 # junweiliang@work_laptop:~/Desktop/projects/tennis_project$ python run_od_on_camera.py  --cam_num 1
@@ -28,10 +29,7 @@ parser.add_argument("--output_image", help="grab a image from camera and save to
 # 可能需要在笔记本电脑上登录一下你的账号，唤醒一下摄像头
 
 
-# initialize the object detection model
-# this will auto download the YOLOv9 checkpoint
-# see here for all the available models: https://docs.ultralytics.com/models/yolov9/#performance-on-ms-coco-dataset
-model = YOLO("yolov9t.pt")
+
 
 
 def run_od_on_image(
@@ -84,6 +82,11 @@ def count_people(det_results):
 
 if __name__ == "__main__":
     args = parser.parse_args()
+
+    # initialize the object detection model
+    # this will auto download the YOLOv9 checkpoint
+    # see here for all the available models: https://docs.ultralytics.com/models/yolov9/#performance-on-ms-coco-dataset
+    model = YOLO(args.model_name)
 
     # 1. assume we are in a laptop, grab an image from the web camera
 
