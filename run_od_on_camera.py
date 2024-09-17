@@ -29,9 +29,6 @@ parser.add_argument("--model_name", default="yolov9t.pt")
 # 可能需要在笔记本电脑上登录一下你的账号，唤醒一下摄像头
 
 
-
-
-
 def run_od_on_image(
         frame_cv2, od_model,
         classes=[], conf=0.5,
