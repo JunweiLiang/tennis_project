@@ -154,11 +154,14 @@ if __name__ == "__main__":
             config = Config()
 
             # 1920x1080 only supports 15 fps for Femolt Bolt
-            color_profile = pipeline.get_stream_profile_list(OBSensorType.COLOR_SENSOR).get_video_stream_profile(1280, 960, OBFormat.RGB, 30)
+            #color_profile = pipeline.get_stream_profile_list(OBSensorType.COLOR_SENSOR).get_video_stream_profile(1280, 960, OBFormat.RGB, 30)
             # Up to 1024X1024@15fps (WFOV), 640X576@30fps (NFOV)
             #depth_profile = pipeline.get_stream_profile_list(OBSensorType.DEPTH_SENSOR).get_default_video_stream_profile()
-            depth_profile = pipeline.get_stream_profile_list(OBSensorType.DEPTH_SENSOR).get_video_stream_profile(640, 576, OBFormat.Y16, 30)
+            #depth_profile = pipeline.get_stream_profile_list(OBSensorType.DEPTH_SENSOR).get_video_stream_profile(640, 576, OBFormat.Y16, 30)
 
+            # for Gemini 336L
+            color_profile = pipeline.get_stream_profile_list(OBSensorType.COLOR_SENSOR).get_video_stream_profile(1280, 800, OBFormat.RGB, 30)
+            depth_profile = pipeline.get_stream_profile_list(OBSensorType.DEPTH_SENSOR).get_video_stream_profile(1280, 800, OBFormat.Y16, 30)
 
 
             # color profile : 1920x1080@15_OBFormat.RGB
