@@ -307,7 +307,7 @@ if __name__ == "__main__":
             fps = frame_count / (current_time - start_time)
             image = cv2.putText(
                 image, "FPS: %d" % int(fps),
-                (10, 450), cv2.FONT_HERSHEY_SIMPLEX,
+                (10, 250), cv2.FONT_HERSHEY_SIMPLEX,
                 fontScale=1, color=(0, 0, 255), thickness=2)
 
             if args.save_to_avi is not None:
