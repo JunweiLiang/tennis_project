@@ -9,6 +9,10 @@ This repo contains clean exercise code for:
     ```
         $ python run_od_on_camera.py
     ```
++ running open-vocabulary object detection
+    ```
+        $ python run_open_od_on_camera.py --prompts "blue box" --prompts "yellow box"
+    ```
 + running pose estimation on web cameras
 + grab depth images (and compute 3D point distances) using depth cameras (D455i, Femoto Bolt)
 + Show RGB and depth visualization and also save the visualization into a AVI video
