@@ -4,8 +4,6 @@
 
 # you can install cv2 with $ pip install opencv-python
 import cv2
-
-import sys
 import argparse
 
 # This is a good open-source wrapper
@@ -19,8 +17,9 @@ parser = argparse.ArgumentParser()
 
 parser.add_argument("--cam_num", type=int, default=0,
         help="camera num")
-parser.add_argument("--output_image", help="grab a image from camera and save to this file")
 parser.add_argument("--model_name", default="yolov9t.pt")
+
+parser.add_argument("--output_image", help="grab a image from camera and save to this file")
 
 # example run on a macbook
 # junweiliang@work_laptop:~/Desktop/projects/tennis_project$ python run_od_on_camera.py  --cam_num 1
@@ -31,22 +30,21 @@ parser.add_argument("--model_name", default="yolov9t.pt")
 
 def run_od_on_image(
         frame_cv2, od_model,
-        classes=[], conf=0.5,
+        classes=None, conf=0.5,
         bbox_thickness=4, text_thickness=2, font_size=2):
     """
-        run object detection inference and visualize in the image
+        Run object detection inference and visualize in the image.
+        Return: the visualization image and the detection results
     """
 
     # see here for inference arguments
     # https://docs.ultralytics.com/modes/predict/#inference-arguments
     results = od_model.predict(
         frame_cv2,
-        classes=None if len(classes)==0 else classes,  # you can specify the classes you want
+        classes=classes,  # you can specify the classes you want
         # see here for coco class indexes [0-79], 0 is person: https://gist.github.com/AruniRC/7b3dadd004da04c80198557db5da4bda
         #classes=[0, 32], # detect person and sports ball only
-        conf=conf,
-        #half=True
-        )
+        conf=conf)
 
     # see here for the API documentation of results
     # https://docs.ultralytics.com/modes/predict/#working-with-results
@@ -68,6 +66,9 @@ def run_od_on_image(
 
 
 def count_people(det_results):
+    """
+        Given the detection result, count the number of people
+    """
     num_people = 0
     result = det_results[0] # we run it on single image
     for box in result.boxes:
@@ -92,7 +93,6 @@ if __name__ == "__main__":
 
     cam = cv2.VideoCapture(cam_num)
 
-    # junwei: use try for more robust code with detailed exception handling
     try:
         if cam is None or not cam.isOpened():
             raise Exception("failed to grab camera %s" % cam_num)
@@ -125,7 +125,9 @@ if __name__ == "__main__":
 
                 num_people = count_people(det_results)
 
-                frame = cv2.rectangle(frame, (0, frame.shape[0]-20), (800, frame.shape[0]-120), (0, 0, 0), -1)
+                frame = cv2.rectangle(
+                    frame, (0, frame.shape[0]-20),
+                    (800, frame.shape[0]-120), (0, 0, 0), -1)
                 frame = cv2.putText(
                     frame, "# People: %d" % num_people,
                     (20, frame.shape[0]-40), cv2.FONT_HERSHEY_SIMPLEX,
