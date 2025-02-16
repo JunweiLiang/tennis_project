@@ -34,7 +34,7 @@ parser.add_argument("--output_image", help="grab a image from camera and save to
 
 def run_od_on_image(
         frame_cv2, od_model,
-        classes=None, conf=0.5,
+        classes=None, conf=0.3,
         bbox_thickness=4, text_thickness=2, font_size=2):
     """
         Run object detection inference and visualize in the image.
