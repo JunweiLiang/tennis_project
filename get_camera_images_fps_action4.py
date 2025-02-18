@@ -38,6 +38,11 @@ if __name__ == "__main__":
         print("failed to grab camera %s" % cam_num)
 
     else:
+        if args.set_to_hd_120fps:
+            cam.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
+            cam.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
+            cam.get(cv2.CAP_PROP_FPS, 120)
+
         # you can print out the info about your camera
         print("------ info about your camera ----")
         print("CV_CAP_PROP_FRAME_WIDTH: '{}'".format(cam.get(cv2.CAP_PROP_FRAME_WIDTH)))
@@ -53,9 +58,6 @@ if __name__ == "__main__":
         print("CAP_PROP_CONVERT_RGB : '{}'".format(cam.get(cv2.CAP_PROP_CONVERT_RGB)))
         print("------- end camera info ----")
 
-        if args.set_to_hd_120fps:
-            cam.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
-            cam.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
 
         if args.show_streaming:
 
