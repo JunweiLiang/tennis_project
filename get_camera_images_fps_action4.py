@@ -40,7 +40,7 @@ if __name__ == "__main__":
 
     else:
         if args.set_to_hd_120fps:
-            fourcc = cv2.VideoWriter_fourcc(*'MJPG')
+            fourcc = cv2.VideoWriter_fourcc(*'DIVX')
             cam.set(cv2.CAP_PROP_FOURCC, fourcc)
             cam.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
             cam.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
