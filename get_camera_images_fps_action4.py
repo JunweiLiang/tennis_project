@@ -53,7 +53,7 @@ if __name__ == "__main__":
         print("CV_CAP_PROP_FRAME_WIDTH: '{}'".format(cam.get(cv2.CAP_PROP_FRAME_WIDTH)))
         print("CV_CAP_PROP_FRAME_HEIGHT : '{}'".format(cam.get(cv2.CAP_PROP_FRAME_HEIGHT)))
         print("CAP_PROP_FPS : '{}'".format(cam.get(cv2.CAP_PROP_FPS)))
-        backend = cap.get(cv2.CAP_PROP_BACKEND)
+        backend = cam.get(cv2.CAP_PROP_BACKEND)
         print(f"Backend used: {backend}")
 
         #•   MJPG: Motion JPEG, often used by webcams.
