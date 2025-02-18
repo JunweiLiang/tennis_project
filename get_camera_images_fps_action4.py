@@ -42,8 +42,8 @@ if __name__ == "__main__":
         if args.set_to_hd_120fps:
             fourcc = cv2.VideoWriter_fourcc(*'MJPG') # this is needed for the IMX577 high-fps camera
             cam.set(cv2.CAP_PROP_FOURCC, fourcc)
-            cam.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
-            cam.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
+            cam.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
+            cam.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
             cam.set(cv2.CAP_PROP_FPS, 120)
 
         # you can print out the info about your camera
