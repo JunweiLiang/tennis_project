@@ -51,6 +51,8 @@ if __name__ == "__main__":
         print("CV_CAP_PROP_FRAME_WIDTH: '{}'".format(cam.get(cv2.CAP_PROP_FRAME_WIDTH)))
         print("CV_CAP_PROP_FRAME_HEIGHT : '{}'".format(cam.get(cv2.CAP_PROP_FRAME_HEIGHT)))
         print("CAP_PROP_FPS : '{}'".format(cam.get(cv2.CAP_PROP_FPS)))
+
+        print("CAP_PROP_FOURCC : '{}'".format(cam.get(cv2.CAP_PROP_FOURCC)))
         print("CAP_PROP_POS_MSEC : '{}'".format(cam.get(cv2.CAP_PROP_POS_MSEC)))
         print("CAP_PROP_FRAME_COUNT  : '{}'".format(cam.get(cv2.CAP_PROP_FRAME_COUNT)))
         print("CAP_PROP_BRIGHTNESS : '{}'".format(cam.get(cv2.CAP_PROP_BRIGHTNESS)))
