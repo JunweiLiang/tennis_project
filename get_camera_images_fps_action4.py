@@ -54,8 +54,8 @@ if __name__ == "__main__":
         print("------- end camera info ----")
 
         if args.set_to_hd_120fps:
-            cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
-            cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
+            cam.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
+            cam.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
 
         if args.show_streaming:
 
