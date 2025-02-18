@@ -52,7 +52,15 @@ if __name__ == "__main__":
         print("CV_CAP_PROP_FRAME_HEIGHT : '{}'".format(cam.get(cv2.CAP_PROP_FRAME_HEIGHT)))
         print("CAP_PROP_FPS : '{}'".format(cam.get(cv2.CAP_PROP_FPS)))
 
-        print("CAP_PROP_FOURCC : '{}'".format(cam.get(cv2.CAP_PROP_FOURCC)))
+        #•   MJPG: Motion JPEG, often used by webcams.
+        #•   XVID: A popular codec (divx-based).
+        #•   DIVX: Another commonly used codec for video compression.
+        #•   H264: H.264 video codec (used in modern video streaming).
+        #•   VP80: WebM format with VP8 codec.
+        fourcc = int(cam.get(cv2.CAP_PROP_FOURCC))
+        fourcc_str = ''.join([chr((fourcc >> (i * 8)) & 0xFF) for i in range(4)])
+        print("CAP_PROP_FOURCC : '{}'".format(fourcc_str))
+
         print("CAP_PROP_POS_MSEC : '{}'".format(cam.get(cv2.CAP_PROP_POS_MSEC)))
         print("CAP_PROP_FRAME_COUNT  : '{}'".format(cam.get(cv2.CAP_PROP_FRAME_COUNT)))
         print("CAP_PROP_BRIGHTNESS : '{}'".format(cam.get(cv2.CAP_PROP_BRIGHTNESS)))
