@@ -41,7 +41,7 @@ if __name__ == "__main__":
         if args.set_to_hd_120fps:
             cam.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
             cam.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
-            cam.get(cv2.CAP_PROP_FPS, 120)
+            cam.set(cv2.CAP_PROP_FPS, 120)
 
         # you can print out the info about your camera
         print("------ info about your camera ----")
