@@ -16,6 +16,7 @@ parser.add_argument("--show_streaming",
 parser.add_argument("--cam_num", type=int, default=0,
         help="camera num")
 parser.add_argument("--output_image", default="", help="grab a image from camera and save to this file")
+parser.add_argument("--set_to_hd_120fps", action="store_true")
 
 # 1. example use to get an image from the laptop camera
 # (base) junweil@precognition-laptop2:~$ python ~/projects/tennis_project/get_camera_image.py Downloads/output.png
@@ -52,6 +53,9 @@ if __name__ == "__main__":
         print("CAP_PROP_CONVERT_RGB : '{}'".format(cam.get(cv2.CAP_PROP_CONVERT_RGB)))
         print("------- end camera info ----")
 
+        if args.set_to_hd_120fps:
+            cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
+            cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
 
         if args.show_streaming:
 
