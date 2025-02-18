@@ -32,8 +32,8 @@ if __name__ == "__main__":
     ## note that if you are on Macbook, and you have a iphone, camera 0 might be your iphone camera!!
     cam_num = args.cam_num
 
-    cam = cv2.VideoCapture(cam_num)
-    # cap = cv2.VideoCapture(0, cv2.CAP_V4L2)
+    #cam = cv2.VideoCapture(cam_num)
+    cam = cv2.VideoCapture(0, cv2.CAP_V4L2)
     # cv2.CAP_GSTREAMER
     # cv2.CAP_FFMPEG
 
@@ -44,8 +44,8 @@ if __name__ == "__main__":
         if args.set_to_hd_120fps:
             fourcc = cv2.VideoWriter_fourcc(*'MJPG') # this is needed for the IMX577 high-fps camera
             cam.set(cv2.CAP_PROP_FOURCC, fourcc)
-            cam.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
-            cam.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
+            cam.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
+            cam.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
             cam.set(cv2.CAP_PROP_FPS, 120)
 
         # you can print out the info about your camera
