@@ -33,6 +33,9 @@ if __name__ == "__main__":
     cam_num = args.cam_num
 
     cam = cv2.VideoCapture(cam_num)
+    # cap = cv2.VideoCapture(0, cv2.CAP_V4L2)
+    # cv2.CAP_GSTREAMER
+    # cv2.CAP_FFMPEG
 
     if cam is None or not cam.isOpened():
         print("failed to grab camera %s" % cam_num)
@@ -50,6 +53,8 @@ if __name__ == "__main__":
         print("CV_CAP_PROP_FRAME_WIDTH: '{}'".format(cam.get(cv2.CAP_PROP_FRAME_WIDTH)))
         print("CV_CAP_PROP_FRAME_HEIGHT : '{}'".format(cam.get(cv2.CAP_PROP_FRAME_HEIGHT)))
         print("CAP_PROP_FPS : '{}'".format(cam.get(cv2.CAP_PROP_FPS)))
+        backend = cap.get(cv2.CAP_PROP_BACKEND)
+        print(f"Backend used: {backend}")
 
         #•   MJPG: Motion JPEG, often used by webcams.
         #•   XVID: A popular codec (divx-based).
