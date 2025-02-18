@@ -33,7 +33,7 @@ if __name__ == "__main__":
     cam_num = args.cam_num
 
     #cam = cv2.VideoCapture(cam_num)
-    cam = cv2.VideoCapture(0, cv2.CAP_GSTREAMER)
+    cam = cv2.VideoCapture(0, cv2.CAP_FFMPEG)
     # cv2.CAP_GSTREAMER
     # cv2.CAP_FFMPEG
     # cv2.CAP_V4L2 (default?)
