@@ -32,7 +32,6 @@ if __name__ == "__main__":
     ## note that if you are on Macbook, and you have a iphone, camera 0 might be your iphone camera!!
     cam_num = args.cam_num
 
-    #cam = cv2.VideoCapture(cam_num, cv2.CAP_DSHOW)
     cam = cv2.VideoCapture(cam_num)
 
     if cam is None or not cam.isOpened():
