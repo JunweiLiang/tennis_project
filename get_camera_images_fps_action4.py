@@ -77,7 +77,7 @@ if __name__ == "__main__":
 
                 frame = cv2.putText(
                     frame, "FPS: %d" % int(fps),
-                    (10, 710), cv2.FONT_HERSHEY_SIMPLEX,
+                    (10, 450), cv2.FONT_HERSHEY_SIMPLEX,
                     fontScale=1, color=(0, 0, 255), thickness=2)
 
                 cv2.imshow("frame", frame)
