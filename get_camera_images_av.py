@@ -78,6 +78,9 @@ if __name__ == "__main__":
                     Size: Discrete 1920x1080
                         Interval: Discrete 0.200s (5.000 fps)
 
+        $ conda install av -c conda-forge
+        # use this to install pyav with an independant ffmpeg, otherwise opencv imshow got stuck
+
     """
     cam = av.open("/dev/video%s" % cam_num, format="v4l2", options={
         "video_size": "1920x1080",  # Set resolution
