@@ -19,7 +19,7 @@ class WebcamStream:
     def __init__(self, src=0):
         self.stream = cv2.VideoCapture(src, cv2.CAP_V4L2)
         self.stream.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*"MJPG"))
-        self.stream.set(cv2.CAP_PROP_FPS, 120)
+        self.stream.set(cv2.CAP_PROP_FPS, 60)
         self.stream.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
         self.stream.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
         self.ret, self.frame = self.stream.read()
@@ -53,19 +53,12 @@ if __name__ == "__main__":
 
     stream = WebcamStream(cam_num)
 
-
-
-
-
-
-
     print("Now showing the camera stream. press Q to exit.")
     # Use the threaded webcam reader
     start_time = time.time()
     frame_count = 0
     while True:
         frame = stream.read()
-
         frame_count += 1
         current_time = time.time()
         fps = int(frame_count / (current_time - start_time))
@@ -78,8 +71,6 @@ if __name__ == "__main__":
 
         if cv2.waitKey(1) & 0xFF == ord("q"):
             break
-
-
 
     # release window
     stream.stop()
