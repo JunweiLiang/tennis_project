@@ -103,7 +103,7 @@ if __name__ == "__main__":
             start_time = time.time()
             frame_count = 0
             for frame in cam.decode(video=0):
-                frame = frame.to_image()
+                frame = frame.to_ndarray(format="bgr24")  # Convert PyAV frame to OpenCV format
                 frame_count += 1
                 current_time = time.time()
                 fps = int(frame_count / (current_time - start_time))
