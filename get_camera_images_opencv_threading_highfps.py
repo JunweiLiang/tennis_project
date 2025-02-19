@@ -39,11 +39,6 @@ class WebcamStream:
         self.stopped = True
         self.stream.release()
 
-# 1. example use to get an image from the laptop camera
-# (base) junweil@precognition-laptop2:~$ python ~/projects/tennis_project/get_camera_image.py Downloads/output.png
-# if you see
-#   [ WARN:0@0.012] global cap_v4l.cpp:999 open VIDEOIO(V4L2:/dev/video0): can't open camera by index
-# 可能需要在笔记本电脑上登录一下你的账号，唤醒一下摄像头
 
 if __name__ == "__main__":
     args = parser.parse_args()

@@ -81,6 +81,9 @@ if __name__ == "__main__":
         $ conda install av -c conda-forge
         # use this to install pyav with an independant ffmpeg, otherwise opencv imshow got stuck
 
+        # actually, using opencv videocapture with threading will be enough for 1080p@120fps
+
+
     """
     cam = av.open("/dev/video%s" % cam_num, format="v4l2", options={
         "video_size": "1920x1080",  # Set resolution
