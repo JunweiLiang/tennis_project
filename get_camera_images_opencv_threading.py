@@ -19,7 +19,7 @@ class WebcamStream:
     def __init__(self, src=0):
         self.stream = cv2.VideoCapture(src, cv2.CAP_V4L2)
         self.stream.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*"MJPG"))
-        self.stream.set(cv2.CAP_PROP_FPS, 60)
+        self.stream.set(cv2.CAP_PROP_FPS, 120)
         self.stream.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
         self.stream.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
         self.ret, self.frame = self.stream.read()
