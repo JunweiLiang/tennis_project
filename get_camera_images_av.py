@@ -107,8 +107,7 @@ if __name__ == "__main__":
                 frame_count += 1
                 current_time = time.time()
                 fps = int(frame_count / (current_time - start_time))
-                print("Frame received. fps:%s" % fps)  # Debugging print
-                continue
+
                 frame = cv2.putText(
                     frame, "FPS: %d" % int(fps),
                     (10, 450), cv2.FONT_HERSHEY_SIMPLEX,
