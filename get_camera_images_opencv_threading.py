@@ -24,11 +24,13 @@ class WebcamStream:
         self.stream.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
         self.ret, self.frame = self.stream.read()
         self.stopped = False
+        self.frame_count = 0
         threading.Thread(target=self.update, daemon=True).start()
 
     def update(self):
         while not self.stopped:
             self.ret, self.frame = self.stream.read()
+            self.frame_count += 1 # count the actual frame we get from opencv
 
     def read(self):
         return self.frame
@@ -56,10 +58,9 @@ if __name__ == "__main__":
     print("Now showing the camera stream. press Q to exit.")
     # Use the threaded webcam reader
     start_time = time.time()
-    frame_count = 0
     while True:
         frame = stream.read()
-        frame_count += 1
+        frame_count = stream.frame_count
         current_time = time.time()
         fps = int(frame_count / (current_time - start_time))
         frame = cv2.putText(
