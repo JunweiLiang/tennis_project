@@ -20,6 +20,7 @@ parser.add_argument("--cam_num", type=int, default=0,
         help="camera num")
 parser.add_argument("--model_name", default="yolov8s-worldv2.pt")
 parser.add_argument("--prompts", action="append", help="set prompt with quotes", default=None)
+parser.add_argument("--conf", default=0.2, type=float, help="confident score threshold")
 # example
 # tennis_project$ python run_open_od_on_camera.py --prompts "blue box" --prompts "yellow box"
 
@@ -119,7 +120,7 @@ if __name__ == "__main__":
                 if not ret:
                     raise Exception("Error: Could not read frame from webcam.")
 
-                frame, det_results = run_od_on_image(frame, model)
+                frame, det_results = run_od_on_image(frame, model, conf=args.conf)
 
                 cv2.imshow("frame", frame)
 
