@@ -50,7 +50,7 @@ if __name__ == "__main__":
     ## note that if you are on Macbook, and you have a iphone, camera 0 might be your iphone camera!!
     cam_num = args.cam_num
 
-    stream = WebcamStream(cam_num)
+    stream = WebcamStream(cam_num, fps=args.fps)
 
     print("Now showing the camera stream. press Q to exit.")
     # Use the threaded webcam reader
