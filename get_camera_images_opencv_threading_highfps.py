@@ -16,14 +16,18 @@ parser.add_argument("--cam_num", type=int, default=0,
         help="camera num")
 parser.add_argument("--fps", type=int, default=60,
         help="fps. ")
+parser.add_argument("--h", type=int, default=1080,
+        help="image height ")
+parser.add_argument("--w", type=int, default=1920,
+        help="image width ")
 
 class WebcamStream:
-    def __init__(self, src=0, fps=60):
+    def __init__(self, src=0, fps=60, h=1080, w=1920):
         self.stream = cv2.VideoCapture(src, cv2.CAP_V4L2)
         self.stream.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*"MJPG"))
         self.stream.set(cv2.CAP_PROP_FPS, fps)
-        self.stream.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
-        self.stream.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
+        self.stream.set(cv2.CAP_PROP_FRAME_WIDTH, w)
+        self.stream.set(cv2.CAP_PROP_FRAME_HEIGHT, h)
         self.ret, self.frame = self.stream.read()
         self.stopped = False
         self.frame_count = 0
@@ -50,7 +54,7 @@ if __name__ == "__main__":
     ## note that if you are on Macbook, and you have a iphone, camera 0 might be your iphone camera!!
     cam_num = args.cam_num
 
-    stream = WebcamStream(cam_num, fps=args.fps)
+    stream = WebcamStream(cam_num, fps=args.fps, h=args.h, w=args.w)
 
     print("Now showing the camera stream. press Q to exit.")
     # Use the threaded webcam reader
