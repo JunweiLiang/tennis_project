@@ -83,4 +83,28 @@ This repo contains clean exercise code for:
 1. align the two camera like [this](tennis_est_examples/2_highspeed_camera_setup.jpg)
 2. run visualization and saving video to disk (nvme is better):
 ```
+    # the original video frame will run as fast as 180 fps, we write the video to 20 fps, so a 1/9 slow-down
+
+    # camera 1 (2ms shutter speed, 3.6mm lens)
+        (base) junweil@home-lab:~/projects/tennis_project$ python get_camera_images_opencv_threading_highfps.py --cam_num 0 --fps 180 --h 1024 --w 1280 --save_video --write_video_fps 20 --write_video_path /mnt/nvme1/junweil/test_videos/test_2ms_3.6mm_180to20fps.avi
+
+    # camera 2 (0.5ms shutter speed, 2.8mm wide-angle lens)
+        (base) junweil@home-lab:~/projects/tennis_project$ python get_camera_images_opencv_threading_highfps.py --cam_num 2 --fps 180 --h 1024 --w 1280 --save_video --write_video_fps 20 --write_video_path /mnt/nvme1/junweil/test_videos/test_0.5ms_2.8mm_180to20fps.avi
+
+    # running at the same time, can get ~150 fps on a i9-10900X machine
+```
+3. Process the written video from avi to mp4 so we can analyze them further
+```
+    # watch it and find when the video should start
+        (base) junweil@home-lab:/mnt/nvme1/junweil/test_videos$ mplayer test_2ms_3.6mm_180to20fps.avi
+
+        (base) junweil@home-lab:/mnt/nvme1/junweil/test_videos$ ffmpeg -i test_2ms_3.6mm_180to20fps.avi -ss 00:00:49 -c:v libx264 test_2ms_3.6mm_180to20fps.mp4
+
+        # and h264 video is much smaller
+            (base) junweil@home-lab:/mnt/nvme1/junweil/test_videos$ du -h *
+                231M    test_0.5ms_2.8mm_180to20fps.avi
+                22M test_0.5ms_2.8mm_180to20fps.mp4
+                158M    test_2ms_3.6mm_180to20fps.avi
+                22M test_2ms_3.6mm_180to20fps.mp4
+
 ```
