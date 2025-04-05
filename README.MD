@@ -81,7 +81,7 @@ This repo contains clean exercise code for:
 ### 04/2025 Adding a script to use high-speed camera
 + We conduct a experiment with two camera and write the video in slow-motion
 0. buy this cheap 180fps@1280x1024@global-shutter camera from taobao: `【淘宝】7天无理由退货 https://e.tb.cn/h.6Uvc10ngnzXBaP1?tk=MtJmey8nens MF168 「高帧率180@ fps全局快门摄像头模组1080P高速抓拍USB模块免驱UVC协」`
-1. align the two camera like [this](tennis_est_examples/2_highspeed_camera_setup.png)
+1. align the two camera like [this](tennis_est_examples/2_highspeed_camera_setup.jpg)
 2. run visualization and saving video to disk (nvme is better):
 ```
     # the original video frame will run as fast as 180 fps, we write the video to 20 fps, so a 1/9 slow-down
@@ -108,5 +108,5 @@ This repo contains clean exercise code for:
                 158M    test_2ms_3.6mm_180to20fps.avi
                 22M test_2ms_3.6mm_180to20fps.mp4
 ```
-4. The camera's shutter speed are 2ms, we can try 0.5ms, the ball's dragging disappeared. but it is too dark. 1ms seems good enough. See this [comparison](tennis_est_examples/0.5ms_vs_1ms_vs_2ms_shutter_speed_180fpsto20fps.jpg).
+4. The camera's shutter speed are 2ms, we can try 0.5ms, the ball's dragging disappeared. but it is too dark. 1ms seems good enough. See this [comparison](tennis_est_examples/0.5ms_vs_1ms_vs_2ms_shutter_speed_180fpsto20fps.png).
 With 1ms shutter speed and additional lighting, we can easily track tennis ball in this video (will need a 4090 laptop to run at 180fps. 2060 laptop run at 70fps): [this](tennis_est_examples/test_1ms_2.8mm_180fpsto20fps.gif)
