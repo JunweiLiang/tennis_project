@@ -9,6 +9,7 @@ import sys
 import argparse
 import time
 import threading
+import queue
 
 parser = argparse.ArgumentParser()
 
@@ -38,23 +39,37 @@ class WebcamStream:
         self.save_video = save_video
         self.writer = None
         if save_video:
-            #fourcc = cv2.VideoWriter_fourcc(*'XVID') # XVID is faster than MJPG
-            fourcc = cv2.VideoWriter_fourcc(*'MP4V')
+            # 200 fps for 100 seconds
+            self.frame_queue = queue.Queue(maxsize=20000)  # Can tune based on memory & burst duration
+
+            fourcc = cv2.VideoWriter_fourcc(*'XVID') # XVID is faster than MJPG
+            #fourcc = cv2.VideoWriter_fourcc(*'MP4V') # speed seems the same as above and file size similar
             #fourcc = cv2.VideoWriter_fourcc(*'H264') # this you will need to install openh264 for ffmpeg
             self.writer = cv2.VideoWriter(output, fourcc, video_fps, (w, h))
-            if not self.writer:
-                print("video writer init failed!")
-                sys.exit()
+            self.writer_thread = threading.Thread(target=self._write_loop, daemon=True)
+            self.writer_thread.start()
 
-        threading.Thread(target=self.update, daemon=True).start()
+        self.read_thread = threading.Thread(target=self.update, daemon=True)
+        self.read_thread.start()
 
     def update(self):
         while not self.stopped:
             self.ret, self.frame = self.stream.read()
             self.frame_count += 1 # count the actual frame we get from opencv
-            if self.save_video and self.ret and self.writer is not None:
-                # this may slow down the FPS
-                self.writer.write(self.frame)
+            if self.save_video and self.ret:
+                try:
+                    self.frame_queue.put_nowait(self.frame.copy())  # Don't block the capture loop
+                except queue.Full:
+                    # Drop frames if queue is full
+                    pass
+
+    def _write_loop(self):
+        while not self.stopped or not self.frame_queue.empty():
+            try:
+                frame = self.frame_queue.get(timeout=0.1)
+                self.writer.write(frame)
+            except queue.Empty:
+                continue
 
 
     def read(self):
@@ -62,8 +77,10 @@ class WebcamStream:
 
     def stop(self):
         self.stopped = True
+        self.read_thread.join()
         self.stream.release()
-        if self.writer:
+        if self.save_video:
+            self.writer_thread.join()
             self.writer.release()
 
 
