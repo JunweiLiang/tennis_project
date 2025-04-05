@@ -20,9 +20,12 @@ parser.add_argument("--h", type=int, default=1080,
         help="image height ")
 parser.add_argument("--w", type=int, default=1920,
         help="image width ")
+parser.add_argument("--save_video", action="store_true")
+parser.add_argument("--write_video_fps", default=30.0, type=float)
+parser.add_argument("--write_video_path", default="output.avi")
 
 class WebcamStream:
-    def __init__(self, src=0, fps=60, h=1080, w=1920):
+    def __init__(self, src=0, fps=60, h=1080, w=1920, save_video=False, video_fps=30.0, output="output.avi"):
         self.stream = cv2.VideoCapture(src, cv2.CAP_V4L2)
         self.stream.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*"MJPG"))
         self.stream.set(cv2.CAP_PROP_FPS, fps)
@@ -31,12 +34,23 @@ class WebcamStream:
         self.ret, self.frame = self.stream.read()
         self.stopped = False
         self.frame_count = 0
+
+        self.save_video = save_video
+        self.writer = None
+        if save_video:
+            fourcc = cv2.VideoWriter_fourcc(*'XVID')
+            self.writer = cv2.VideoWriter(output, fourcc, video_fps, (w, h))
+
         threading.Thread(target=self.update, daemon=True).start()
 
     def update(self):
         while not self.stopped:
             self.ret, self.frame = self.stream.read()
             self.frame_count += 1 # count the actual frame we get from opencv
+            if self.save_video and self.ret and self.writer is not None:
+                # this may slow down the FPS
+                self.writer.write(self.frame)
+
 
     def read(self):
         return self.frame
@@ -44,6 +58,8 @@ class WebcamStream:
     def stop(self):
         self.stopped = True
         self.stream.release()
+        if self.writer:
+            self.writer.release()
 
 
 if __name__ == "__main__":
@@ -53,8 +69,13 @@ if __name__ == "__main__":
 
     ## note that if you are on Macbook, and you have a iphone, camera 0 might be your iphone camera!!
     cam_num = args.cam_num
+    if args.save_video:
+        print("write video @%d fps to %s" % (args.write_video_fps, args.write_video_path))
 
-    stream = WebcamStream(cam_num, fps=args.fps, h=args.h, w=args.w)
+
+    stream = WebcamStream(cam_num,
+        fps=args.fps, h=args.h, w=args.w,
+        save_video=args.save_video, video_fps=args.write_video_fps, output=args.write_video_path)
 
     print("Now showing the camera stream. press Q to exit.")
     # Use the threaded webcam reader
