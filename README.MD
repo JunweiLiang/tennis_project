@@ -77,3 +77,10 @@ This repo contains clean exercise code for:
 ### Other potential resources
 + From Roboflow `https://universe.roboflow.com/search?q=class%3Atennis-ball`
 + This repo has a good perception component for tennis `https://core-robotics-lab.github.io/Wheelchair-Tennis-Robot/`
+
+### 04/2025 Adding a script to use high-speed camera
++ We conduct a experiment with two camera and write the video in slow-motion
+1. align the two camera like [this](tennis_est_examples/2_highspeed_camera_setup.jpg)
+2. run visualization and saving video to disk (nvme is better):
+```
+```

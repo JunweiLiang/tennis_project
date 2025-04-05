@@ -80,7 +80,8 @@ class WebcamStream:
             if self.save_video:
                 usage = self.frame_queue.qsize()
                 percent = 100.0 * usage / self.frame_queue.maxsize
-                print(f"\r[Queue] {usage:5d}/{self.frame_queue.maxsize} ({percent:5.1f}%)", end="")
+                # this will be printed in the same line
+                print(f"\r[Frame queue usage] {usage:5d}/{self.frame_queue.maxsize} ({percent:5.1f}%)", end="")
             time.sleep(0.5)
 
     def read(self):
@@ -91,7 +92,7 @@ class WebcamStream:
         self.read_thread.join()
         self.stream.release()
         if self.save_video:
-            print("[INFO] Waiting for video writer to flush remaining frames...")
+            print("\n[INFO] Waiting for video writer to flush remaining frames...")
             self.writer_thread.join()
             self.writer.release()
 
