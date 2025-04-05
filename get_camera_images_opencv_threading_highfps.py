@@ -41,7 +41,7 @@ class WebcamStream:
             #fourcc = cv2.VideoWriter_fourcc(*'XVID')
             fourcc = cv2.VideoWriter_fourcc(*'mp4v')
             self.writer = cv2.VideoWriter(output, fourcc, video_fps, (w, h))
-            if self.writer:
+            if not self.writer:
                 print("video writer init failed!")
                 sys.exit()
 
