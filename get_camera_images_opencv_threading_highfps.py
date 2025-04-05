@@ -49,6 +49,9 @@ class WebcamStream:
             self.writer_thread = threading.Thread(target=self._write_loop, daemon=True)
             self.writer_thread.start()
 
+            self.monitor_thread = threading.Thread(target=self._monitor_queue, daemon=True)
+            self.monitor_thread.start()
+
         self.read_thread = threading.Thread(target=self.update, daemon=True)
         self.read_thread.start()
 
@@ -64,6 +67,7 @@ class WebcamStream:
                     pass
 
     def _write_loop(self):
+        # after stop, this will continue to write until all frames are written
         while not self.stopped or not self.frame_queue.empty():
             try:
                 frame = self.frame_queue.get(timeout=0.1)
@@ -71,6 +75,13 @@ class WebcamStream:
             except queue.Empty:
                 continue
 
+    def _monitor_queue(self):
+        while not self.stopped:
+            if self.save_video:
+                usage = self.frame_queue.qsize()
+                percent = 100.0 * usage / self.frame_queue.maxsize
+                print(f"\r[Queue] {usage:5d}/{self.frame_queue.maxsize} ({percent:5.1f}%)", end="")
+            time.sleep(0.5)
 
     def read(self):
         return self.frame
@@ -80,6 +91,7 @@ class WebcamStream:
         self.read_thread.join()
         self.stream.release()
         if self.save_video:
+            print("[INFO] Waiting for video writer to flush remaining frames...")
             self.writer_thread.join()
             self.writer.release()
 
