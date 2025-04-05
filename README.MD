@@ -81,7 +81,7 @@ This repo contains clean exercise code for:
 ### 04/2025 Adding a script to use high-speed camera
 + We conduct a experiment with two camera and write the video in slow-motion
 0. buy this cheap 180fps@1280x1024@global-shutter camera from taobao: `【淘宝】7天无理由退货 https://e.tb.cn/h.6Uvc10ngnzXBaP1?tk=MtJmey8nens MF168 「高帧率180@ fps全局快门摄像头模组1080P高速抓拍USB模块免驱UVC协」`
-1. align the two camera like [this](tennis_est_examples/2_highspeed_camera_setup.jpg)
+1. align the two camera like [this](tennis_est_examples/2_highspeed_camera_setup.png)
 2. run visualization and saving video to disk (nvme is better):
 ```
     # the original video frame will run as fast as 180 fps, we write the video to 20 fps, so a 1/9 slow-down
