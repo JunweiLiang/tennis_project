@@ -88,8 +88,8 @@ This repo contains clean exercise code for:
     # camera 1 (2ms shutter speed, 3.6mm lens)
         (base) junweil@home-lab:~/projects/tennis_project$ python get_camera_images_opencv_threading_highfps.py --cam_num 0 --fps 180 --h 1024 --w 1280 --save_video --write_video_fps 20 --write_video_path /mnt/nvme1/junweil/test_videos/test_2ms_3.6mm_180to20fps.avi
 
-    # camera 2 (0.5ms shutter speed, 2.8mm wide-angle lens)
-        (base) junweil@home-lab:~/projects/tennis_project$ python get_camera_images_opencv_threading_highfps.py --cam_num 2 --fps 180 --h 1024 --w 1280 --save_video --write_video_fps 20 --write_video_path /mnt/nvme1/junweil/test_videos/test_0.5ms_2.8mm_180to20fps.avi
+    # camera 2 (2ms shutter speed, 2.8mm wide-angle lens)
+        (base) junweil@home-lab:~/projects/tennis_project$ python get_camera_images_opencv_threading_highfps.py --cam_num 2 --fps 180 --h 1024 --w 1280 --save_video --write_video_fps 20 --write_video_path /mnt/nvme1/junweil/test_videos/test_2ms_2.8mm_180to20fps.avi
 
     # running at the same time, can get ~150 fps on a i9-10900X machine
 ```
@@ -102,9 +102,9 @@ This repo contains clean exercise code for:
 
         # and h264 video is much smaller
             (base) junweil@home-lab:/mnt/nvme1/junweil/test_videos$ du -h *
-                231M    test_0.5ms_2.8mm_180to20fps.avi
-                22M test_0.5ms_2.8mm_180to20fps.mp4
+                231M    test_2ms_2.8mm_180to20fps.avi
+                22M test_2ms_2.8mm_180to20fps.mp4
                 158M    test_2ms_3.6mm_180to20fps.avi
                 22M test_2ms_3.6mm_180to20fps.mp4
-
 ```
+4. The camera's shutter speed are 2ms, we can try 0.5ms, the ball's dragging disappeared. but it is too dark. 1ms seems good enough. See this [comparison](tennis_est_examples/0.5ms_vs_1ms_vs_2ms_shutter_speed_180fpsto20fps.jpg)
