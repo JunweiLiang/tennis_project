@@ -38,7 +38,8 @@ class WebcamStream:
         self.save_video = save_video
         self.writer = None
         if save_video:
-            fourcc = cv2.VideoWriter_fourcc(*'XVID')
+            #fourcc = cv2.VideoWriter_fourcc(*'XVID')
+            fourcc = cv2.VideoWriter_fourcc(*'H264')
             self.writer = cv2.VideoWriter(output, fourcc, video_fps, (w, h))
 
         threading.Thread(target=self.update, daemon=True).start()
