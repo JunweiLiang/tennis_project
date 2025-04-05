@@ -38,8 +38,9 @@ class WebcamStream:
         self.save_video = save_video
         self.writer = None
         if save_video:
-            #fourcc = cv2.VideoWriter_fourcc(*'XVID')
-            fourcc = cv2.VideoWriter_fourcc(*'MJPG')
+            #fourcc = cv2.VideoWriter_fourcc(*'XVID') # XVID is faster than MJPG
+            #fourcc = cv2.VideoWriter_fourcc(*'MP4V')
+            fourcc = cv2.VideoWriter_fourcc(*'H264')
             self.writer = cv2.VideoWriter(output, fourcc, video_fps, (w, h))
             if not self.writer:
                 print("video writer init failed!")
