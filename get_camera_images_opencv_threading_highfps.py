@@ -10,6 +10,7 @@ import argparse
 import time
 import threading
 import queue
+import datetime
 
 parser = argparse.ArgumentParser()
 
@@ -61,7 +62,10 @@ class WebcamStream:
             self.frame_count += 1 # count the actual frame we get from opencv
             if self.save_video and self.ret:
                 try:
-                    self.frame_queue.put_nowait(self.frame.copy())  # Don't block the capture loop
+                    # put a timestamp for the frame for possible synchronization
+                    # and a frame index to look up depth data
+                    date_time = str(datetime.datetime.now())
+                    self.frame_queue.put_nowait((self.frame.copy(), date_time, self.frame_count))  # Don't block the capture loop
                 except queue.Full:
                     # Drop frames if queue is full
                     pass
@@ -70,7 +74,11 @@ class WebcamStream:
         # after stop, this will continue to write until all frames are written
         while not self.stopped or not self.frame_queue.empty():
             try:
-                frame = self.frame_queue.get(timeout=0.1)
+                frame, date_time, frame_index = self.frame_queue.get(timeout=0.1)
+                frame = cv2.putText(
+                    frame, "#%d: %s" % (frame_index, date_time),
+                    (10, 30), cv2.FONT_HERSHEY_SIMPLEX,
+                    fontScale=1, color=(0, 0, 255), thickness=2)
                 self.writer.write(frame)
             except queue.Empty:
                 continue
