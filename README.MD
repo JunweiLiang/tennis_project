@@ -133,12 +133,19 @@ With 1ms shutter speed and additional lighting, we can easily track tennis ball 
 
                 # install the sdk in the base environment
 
+                # 报错 缺少LIBXxx3.42
+                    $ cp /usr/lib/x86_64-linux-gnu/libstdc++.so.6 /home/junweil/anaconda3/bin/../lib/
+
         # for Orbbec Gemini 336L, global shutter, RGB max at 1280x800 @60fps, depth max at 1280x800 @30fps
             # https://www.orbbec.com/products/stereo-vision-camera/gemini-336l/
 
-            # 1. visualize depth and RGB
-                (base) junweil@ai-precognition-machine12:~/projects/pyorbbecsdk/examples$ python sync_align.py
+            # 0. set the usb permissions
 
-            # 2. read and save RGB at 60 FPS
-                (base) junweil@ai-precognition-machine12:~/projects/tennis_project$ python get_camera_images_opencv_threading_highfps_orbbec.py --fps 60 --h 800 --w 1280 --save_video --write_video_fps 20 --write_video_path test_orbbec_336L_60to20fps.avi
+                (base) junweil@ai-precognition-machine12:~/projects/pyorbbecsdk$ sudo bash ./scripts/install_udev_rules.sh
+                (base) junweil@ai-precognition-machine12:~/projects/pyorbbecsdk$ sudo udevadm control --reload-rules && sudo udevadm trigger
+
+            # 1. visualize depth and RGB
+                (base) junweil@ai-precognition-machine12:~/projects/pyorbbecsdk/examples$ python depth.py
+
+
 ```
