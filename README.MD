@@ -110,3 +110,35 @@ This repo contains clean exercise code for:
 ```
 4. The camera's shutter speed are 2ms, we can try 0.5ms, the ball's dragging disappeared. but it is too dark. 1ms seems good enough. See this [comparison](tennis_est_examples/0.5ms_vs_1ms_vs_2ms_shutter_speed_180fpsto20fps.png).
 With 1ms shutter speed and additional lighting, we can easily track tennis ball in this video (will need a 4090 laptop to run at 180fps. 2060 laptop run at 70fps): [this](tennis_est_examples/test_1ms_2.8mm_180fpsto20fps.gif)
+
+### 07/2025 Test on a Desktop with 1x3090 GPU and 12-core i7, 48GB RAM machine
+```
+    # list all possible camera devices
+
+        # 电脑有多个摄像头，需要先确定camera_id
+            $ sudo apt install v4l-utils
+            $ v4l2-ctl --list-devices
+
+    # Check FPS of high speed camera [both cameras are 1ms shutter speed now]
+        (base) junweil@ai-precognition-machine12:~/projects/tennis_project$ python get_camera_images_opencv_threading_highfps.py --cam_num 0 --fps 180 --h 1024 --w 1280 --save_video --write_video_fps 20 --write_video_path test_1ms_2.8mm_180to20fps.avi
+
+        # get 180 fps, and 160 fps if saving video frames
+
+    # Orbbec
+        # install the python sdk, we need to build a local python wheel
+
+            (base) junweil@ai-precognition-machine12:~/projects$ git clone https://github.com/orbbec/pyorbbecsdk
+
+            # install documentation: https://orbbec.github.io/pyorbbecsdk/source/2_installation/build_the_package.html#making-a-python-wheel
+
+                # install the sdk in the base environment
+
+        # for Orbbec Gemini 336L, global shutter, RGB max at 1280x800 @60fps, depth max at 1280x800 @30fps
+            # https://www.orbbec.com/products/stereo-vision-camera/gemini-336l/
+
+            # 1. visualize depth and RGB
+                (base) junweil@ai-precognition-machine12:~/projects/pyorbbecsdk/examples$ python sync_align.py
+
+            # 2. read and save RGB at 60 FPS
+                (base) junweil@ai-precognition-machine12:~/projects/tennis_project$ python get_camera_images_opencv_threading_highfps_orbbec.py --fps 60 --h 800 --w 1280 --save_video --write_video_fps 20 --write_video_path test_orbbec_336L_60to20fps.avi
+```
