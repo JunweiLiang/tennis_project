@@ -149,4 +149,13 @@ With 1ms shutter speed and additional lighting, we can easily track tennis ball 
 
             # 2. Run 60 FPS RGB and save videos
 
+                # first check available color profiles
+                    (base) junweil@ai-precognition-machine12:~/projects/tennis_project$ python list_orbbec_color_profiles.py
+                        load extensions from /home/junweil/anaconda3/lib/python3.11/site-packages/extensions
+                        Orbbec pipeline initialized. Attempting to list color profiles...
+
+                        --- Available Color Stream Profiles ---
+                          - Format: OBFormat.MJPG, Resolution: 1280x720, FPS: 30
+                          - Format: OBFormat.MJPG, Resolution: 1280x800, FPS: 60
+
 ```

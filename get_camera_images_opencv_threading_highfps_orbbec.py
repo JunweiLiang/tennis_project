@@ -53,7 +53,7 @@ class OrbbecCameraStream:
         h = int(h)
         color_profile = self.pipeline.get_stream_profile_list(
             ob.OBSensorType.COLOR_SENSOR).get_video_stream_profile(
-                w, h, ob.OBFormat.RGB, fps)
+                w, h, ob.OBFormat.MJPG, fps)
 
         #depth_profile = pipeline.get_stream_profile_list(OBSensorType.DEPTH_SENSOR).get_video_stream_profile(1280, 800, OBFormat.Y16, 30)
         print("color profile : {}x{}@{}_{}".format(color_profile.get_width(),
