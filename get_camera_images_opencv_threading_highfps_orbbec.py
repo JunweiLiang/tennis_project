@@ -123,7 +123,7 @@ class OrbbecCameraStream:
                     # Handle other formats if necessary, or print a warning
                     print(f"Unsupported color format: {self.stream_format}")
                     continue
-                print(color_image_bgr.shape)
+
                 self.frame = color_image_bgr
                 self.frame_count += 1
                 if self.save_video:
