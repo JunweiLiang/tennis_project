@@ -1,13 +1,26 @@
 import pyorbbecsdk as ob
 
 def list_color_profiles():
+    pipeline = None
     try:
         # Create a pipeline. This will automatically open the first available Orbbec device.
         pipeline = ob.Pipeline()
         print("Orbbec pipeline initialized. Attempting to list color profiles...")
 
-        # Get all stream profiles for the color sensor
-        color_profiles = pipeline.get_stream_profiles(ob.StreamType.COLOR)
+        # Get the active device from the pipeline
+        # The pipeline usually has a method to get the device it's currently using
+        # In many pyorbbecsdk versions, you can get the device via pipeline.get_device()
+        device = pipeline.get_device()
+
+        if not device:
+            print("No device found or opened by the pipeline.")
+            return
+
+        print(f"Connected to device: {device.get_usb_info().name} (Serial: {device.get_usb_info().serial_number})")
+
+        # Get all stream profiles for the color sensor directly from the device
+        # The get_stream_profiles method is typically on the device object.
+        color_profiles = device.get_stream_profiles(ob.StreamType.COLOR)
 
         if not color_profiles:
             print("No color stream profiles found on the connected Orbbec device.")
@@ -29,9 +42,8 @@ def list_color_profiles():
     except Exception as e:
         print(f"An error occurred: {e}")
     finally:
-        # It's good practice to ensure the pipeline is stopped, though it might
-        # implicitly clean up on script exit.
-        if 'pipeline' in locals() and pipeline:
+        # Ensure the pipeline is stopped to release resources.
+        if pipeline:
             pipeline.stop()
             print("Pipeline stopped.")
 
