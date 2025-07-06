@@ -16,12 +16,9 @@ def list_color_profiles():
         for profile in color_profiles:
             if isinstance(profile, ob.VideoStreamProfile):
                 # VideoStreamProfile has width, height, and fps
-                print(f"  - Format: {profile.format()}, "
-                      f"Resolution: {profile.width()}x{profile.height()}, "
+                print(f"Resolution: {profile.width()}x{profile.height()}, "
                       f"FPS: {profile.fps()}")
-            elif isinstance(profile, ob.StreamProfile):
-                # Generic StreamProfile (less detailed, but good for completeness)
-                print(f"  - Format: {profile.format()}")
+
             else:
                 print(f"  - Unknown profile type: {type(profile)}")
 
