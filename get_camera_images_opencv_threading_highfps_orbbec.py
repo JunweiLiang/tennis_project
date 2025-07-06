@@ -103,8 +103,10 @@ class OrbbecCameraStream:
                 continue
 
             color_frame = frames.get_color_frame()
+            print("got a color_frame")
             if color_frame:
                 color_image_data = np.frombuffer(color_frame.get_data(), dtype=np.uint8)
+                 print("got a color_frame: %s" % color_image_data.shape)
 
                 if self.stream_format == ob.OBFormat.MJPG:
                     # Decode MJPG data using OpenCV
