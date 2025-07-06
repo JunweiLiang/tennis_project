@@ -147,5 +147,6 @@ With 1ms shutter speed and additional lighting, we can easily track tennis ball 
             # 1. visualize depth and RGB
                 (base) junweil@ai-precognition-machine12:~/projects/pyorbbecsdk/examples$ python depth.py
 
+            # 2. Run 60 FPS RGB and save videos
 
 ```

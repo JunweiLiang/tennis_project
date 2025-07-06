@@ -51,7 +51,6 @@ class OrbbecCameraStream:
         fps = int(fps)
         w = int(w)
         h = int(h)
-        # 1920x1080 only supports 15 fps for Femolt Bolt
         color_profile = self.pipeline.get_stream_profile_list(
             ob.OBSensorType.COLOR_SENSOR).get_video_stream_profile(
                 w, h, ob.OBFormat.RGB, fps)
