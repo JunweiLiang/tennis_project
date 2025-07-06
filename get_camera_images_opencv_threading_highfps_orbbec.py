@@ -93,8 +93,6 @@ class OrbbecCameraStream:
             self.monitor_thread.start()
 
     def update(self):
-        # This thread now primarily manages the 'stopped' state and can be used for other background tasks
-        # The actual frame grabbing is handled by the Orbbec SDK's internal thread and our callback
         while not self.stopped:
             # Wait for a coherent pair of frames: depth and color
             frames = self.pipeline.wait_for_frames(100)  # maximum delay in milliseconds
@@ -103,9 +101,23 @@ class OrbbecCameraStream:
             color_frame = frames.get_color_frame()
             if color_frame:
                 color_image_data = np.frombuffer(color_frame.get_data(), dtype=np.uint8)
-                # Reshape to BGR for OpenCV (Orbbec RGB888 is RGB, OpenCV expects BGR)
-                color_image = color_image_data.reshape((color_frame.get_height(), color_frame.get_width(), 3))
-                color_image_bgr = cv2.cvtColor(color_image, cv2.COLOR_RGB2BGR)
+
+                if self.stream_format == ob.OBFormat.MJPG:
+                    # Decode MJPG data using OpenCV
+                    color_image = cv2.imdecode(color_image_data, cv2.IMREAD_COLOR)
+                    if color_image is None:
+                        print("Failed to decode MJPG frame.")
+                        continue
+                    # imdecode already returns BGR, so no need for cvtColor if it's already BGR
+                    color_image_bgr = color_image
+                elif self.stream_format == ob.OBFormat.RGB:
+                    # For RGB888, reshape and then convert to BGR
+                    color_image = color_image_data.reshape((color_frame.get_height(), color_frame.get_width(), 3))
+                    color_image_bgr = cv2.cvtColor(color_image, cv2.COLOR_RGB2BGR)
+                else:
+                    # Handle other formats if necessary, or print a warning
+                    print(f"Unsupported color format: {self.stream_format}")
+                    continue
 
                 self.frame = color_image_bgr
                 self.frame_count += 1
