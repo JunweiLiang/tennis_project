@@ -158,4 +158,15 @@ With 1ms shutter speed and additional lighting, we can easily track tennis ball 
                           - Format: OBFormat.MJPG, Resolution: 1280x720, FPS: 30
                           - Format: OBFormat.MJPG, Resolution: 1280x800, FPS: 60
 
+                # run and save the video
+
+                    (base) junweil@ai-precognition-machine12:~/projects/tennis_project$ python get_camera_images_opencv_threading_highfps_orbbec.py --fps 60 --h 800 --w 1280 --save_video --write_video_fps 20 --write_video_path test_orbbec_336L_60to20fps.avi --no_show_video
+                        load extensions from /home/junweil/anaconda3/lib/python3.11/site-packages/extensions
+                        write video @20 fps to test_orbbec_336L_60to20fps.avi
+                        Orbbec pipeline initialized, attempting to open the first available device.
+                        color profile : 1280x800@60_OBFormat.MJPG
+                        [Frame queue usage]     0/20000 (  0.0%)Successfully initialized Orbbec RGB stream: 1280x800 @ 60 FPS
+                        Now showing the camera stream. Press Q to exit.
+                        [Frame queue usage]     0/20000 (  0.0%)
+
 ```

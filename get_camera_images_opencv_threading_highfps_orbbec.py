@@ -98,7 +98,10 @@ class OrbbecCameraStream:
             # Wait for a coherent pair of frames: depth and color
             frames = self.pipeline.wait_for_frames(100)  # maximum delay in milliseconds
             if frames is None:
+                print("update function: Waiting for first frame from Orbbec camera...")
+                time.sleep(0.1) # Wait a bit if no frame is available yet
                 continue
+
             color_frame = frames.get_color_frame()
             if color_frame:
                 color_image_data = np.frombuffer(color_frame.get_data(), dtype=np.uint8)
