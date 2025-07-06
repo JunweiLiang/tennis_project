@@ -62,6 +62,7 @@ class OrbbecCameraStream:
                                                color_profile.get_format()))
 
         self.config.enable_stream(color_profile)
+        self.stream_format = color_profile.get_format() # Store the format
 
         self.frame = None
         self.stopped = False
